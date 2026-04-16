@@ -1,0 +1,33 @@
+{
+  "name": "buywhere-mcp",
+  "version": "0.1.0",
+  "description": "BuyWhere MCP server — product catalog tools for Claude Desktop, Cursor, and other MCP-compatible agents",
+  "keywords": ["buywhere", "mcp", "model-context-protocol", "product-catalog", "ecommerce", "ai-agent", "singapore"],
+  "homepage": "https://buywhere.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BuyWhere/buywhere-mcp"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "buywhere-mcp": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
