@@ -21,6 +21,7 @@
  *   BUYWHERE_API_KEY  (required) — your BuyWhere API key
  *   BUYWHERE_API_URL  (optional) — override base URL (default: https://api.buywhere.ai)
  */
+import { fileURLToPath } from "url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ErrorCode, ListResourcesRequestSchema, ListToolsRequestSchema, McpError, ReadResourceRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
@@ -30,9 +31,8 @@ import { CallToolRequestSchema, ErrorCode, ListResourcesRequestSchema, ListTools
 const API_KEY = process.env.BUYWHERE_API_KEY;
 const BASE_URL = (process.env.BUYWHERE_API_URL ?? "https://api.buywhere.ai").replace(/\/$/, "");
 if (!API_KEY) {
-    process.stderr.write("Error: BUYWHERE_API_KEY environment variable is required.\n" +
+    process.stderr.write("Warning: BUYWHERE_API_KEY not set — tool calls will return an auth error.\n" +
         "Get your key at https://buywhere.ai/dashboard\n");
-    // process.exit removed for scanning
 }
 // ---------------------------------------------------------------------------
 // HTTP helpers
@@ -472,6 +472,12 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     };
 });
 // ---------------------------------------------------------------------------
+// Smithery sandbox export (for tool scanning without real credentials)
+// ---------------------------------------------------------------------------
+export function createSandboxServer() {
+    return server;
+}
+// ---------------------------------------------------------------------------
 // Start
 // ---------------------------------------------------------------------------
 async function main() {
@@ -479,8 +485,11 @@ async function main() {
     await server.connect(transport);
     process.stderr.write("BuyWhere MCP server running (stdio)\n");
 }
-main().catch((err) => {
-    process.stderr.write(`Fatal: ${err}\n`);
-    process.exit(1);
-});
+// Only auto-start when run as the entry point, not when imported for Smithery scanning
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    main().catch((err) => {
+        process.stderr.write(`Fatal: ${err}\n`);
+        process.exit(1);
+    });
+}
 //# sourceMappingURL=index.js.map

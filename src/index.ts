@@ -22,6 +22,7 @@
  *   BUYWHERE_API_URL  (optional) — override base URL (default: https://api.buywhere.ai)
  */
 
+import { fileURLToPath } from "url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -580,7 +581,10 @@ async function main() {
   process.stderr.write("BuyWhere MCP server running (stdio)\n");
 }
 
-main().catch((err: unknown) => {
-  process.stderr.write(`Fatal: ${err}\n`);
-  process.exit(1);
-});
+// Only auto-start when run as the entry point, not when imported for Smithery scanning
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err: unknown) => {
+    process.stderr.write(`Fatal: ${err}\n`);
+    process.exit(1);
+  });
+}
