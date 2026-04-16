@@ -581,8 +581,11 @@ async function main() {
   process.stderr.write("BuyWhere MCP server running (stdio)\n");
 }
 
-// Only auto-start when run as the entry point, not when imported for Smithery scanning
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// Only auto-start when run as the entry point, not when imported for Smithery scanning.
+// import.meta.url is undefined when esbuild bundles to CJS (scanner import path),
+// so this guard naturally prevents main() from running during tool scanning.
+const _entryUrl: string | undefined = import.meta.url;
+if (_entryUrl && process.argv[1] === fileURLToPath(_entryUrl)) {
   main().catch((err: unknown) => {
     process.stderr.write(`Fatal: ${err}\n`);
     process.exit(1);
