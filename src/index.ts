@@ -563,6 +563,14 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
 });
 
 // ---------------------------------------------------------------------------
+// Smithery sandbox export (for tool scanning without real credentials)
+// ---------------------------------------------------------------------------
+
+export function createSandboxServer() {
+  return server;
+}
+
+// ---------------------------------------------------------------------------
 // Start
 // ---------------------------------------------------------------------------
 
