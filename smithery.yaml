@@ -1,0 +1,21 @@
+# Smithery configuration for BuyWhere MCP server
+# https://smithery.ai/docs/build/publish
+
+startCommand:
+  type: node
+  configSchema:
+    type: object
+    properties:
+      apiKey:
+        type: string
+        title: BuyWhere API Key
+        description: Your BuyWhere API key. Get one free at https://buywhere.ai/dashboard
+        x-sensitive: true
+    required: []
+  commandFunction: |-
+    (config) => ({
+      command: "node",
+      args: ["dist/index.js"],
+      env: config.apiKey ? { BUYWHERE_API_KEY: config.apiKey } : {}
+    })
+
