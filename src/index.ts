@@ -42,10 +42,9 @@ const BASE_URL = (process.env.BUYWHERE_API_URL ?? "https://api.buywhere.ai").rep
 
 if (!API_KEY) {
   process.stderr.write(
-    "Error: BUYWHERE_API_KEY environment variable is required.\n" +
+    "Warning: BUYWHERE_API_KEY not set — tool calls will return an auth error.\n" +
       "Get your key at https://buywhere.ai/dashboard\n",
   );
-  process.exit(1);
 }
 
 // ---------------------------------------------------------------------------
