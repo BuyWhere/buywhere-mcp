@@ -1,0 +1,37 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.BuyWhere/buywhere-mcp",
+  "title": "BuyWhere MCP",
+  "description": "BuyWhere MCP server for product search, price comparison, and affiliate-ready shopping workflows.",
+  "repository": {
+    "url": "https://github.com/BuyWhere/buywhere-mcp",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "buywhere-mcp",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BUYWHERE_API_KEY",
+          "description": "BuyWhere API key used for authenticated product catalog requests.",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "BUYWHERE_API_URL",
+          "description": "Optional override for the BuyWhere API base URL.",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
