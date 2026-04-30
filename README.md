@@ -63,14 +63,12 @@ Requires `Authorization: Bearer <your-api-key>` header.
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `search_products` | Search by keyword or natural language |
-| `get_product` | Fetch full details for a single product |
-| `get_price` | Compare prices across all merchants |
-| `compare_prices` | Side-by-side comparison of 2–5 products |
-| `get_affiliate_link` | Get click-tracked affiliate URL |
-| `get_catalog` | List available product categories |
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `search_products` | Search by keyword or natural language | `query` (required), `category`, `limit` |
+| `get_product` | Fetch full details for a single product | `product_id` (required) |
+| `find_best_price` | Find the cheapest listing for a product across all merchants | `product_name`, `category` |
+| `get_deals` | Find products with price drops | `category`, `min_discount_pct`, `limit` |
 
 ## Environment variables
 
@@ -84,10 +82,9 @@ Requires `Authorization: Bearer <your-api-key>` header.
 ```bash
 npm install
 npm run build
-BUYWHERE_API_KEY=your_key node dist/index.js
+BUYWHERE_API_KEY=your_key BUYWHERE_API_URL=https://api.buywhere.ai node dist/index.js
 ```
 
 ## License
 
 MIT
-
