@@ -1,6 +1,6 @@
 {
   "name": "buywhere-mcp",
-  "version": "0.2.1",
+  "version": "0.1.3",
   "mcpName": "io.github.buywhere/buywhere-mcp",
   "description": "BuyWhere MCP server — product catalog tools for Claude Desktop, Cursor, and other MCP-compatible agents",
   "keywords": ["buywhere", "mcp", "model-context-protocol", "product-catalog", "ecommerce", "ai-agent", "singapore"],
