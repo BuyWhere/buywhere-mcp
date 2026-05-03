@@ -1,0 +1,50 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.buywhere/buywhere-mcp",
+  "title": "BuyWhere MCP",
+  "description": "BuyWhere MCP server for product search, price comparison, and affiliate-ready shopping workflows across Singapore retailers via Claude, Cursor, and AI agents.",
+  "repository": {
+    "url": "https://github.com/BuyWhere/buywhere-mcp",
+    "source": "github"
+  },
+  "version": "0.2.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@buywhere/mcp-server",
+      "version": "0.2.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BUYWHERE_API_KEY",
+          "description": "Your BuyWhere API key for authenticated product catalog requests",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "BUYWHERE_API_URL",
+          "description": "Override the BuyWhere API base URL (default: https://api.buywhere.ai)",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.buywhere.ai/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Authorization header with Bearer token for authenticated API access",
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
