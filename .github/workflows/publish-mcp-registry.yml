@@ -17,9 +17,7 @@ jobs:
           chmod +x mcp-publisher
 
       - name: Login to MCP Registry
-        run: |
-          # Uses GitHub CLI token for authentication
-          echo "${{ secrets.GITHUB_TOKEN }}" | ./mcp-publisher login github --token-stdin
+        run: ./mcp-publisher login github-oidc
 
       - name: Publish to MCP Registry
         run: ./mcp-publisher publish
