@@ -11,11 +11,11 @@ startCommand:
         title: BuyWhere API Key
         description: Your BuyWhere API key. Get one free at https://buywhere.ai/dashboard
         x-sensitive: true
-    required: []
+    required: [apiKey]
   commandFunction: |-
     (config) => ({
-      command: "node",
-      args: ["dist/index.js"],
+      command: "npx",
+      args: ["-y", "@buywhere/mcp-server"],
       env: config.apiKey ? { BUYWHERE_API_KEY: config.apiKey } : {}
     })
 
