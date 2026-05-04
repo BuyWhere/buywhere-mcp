@@ -4,12 +4,27 @@
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/BuyWhere/buywhere-mcp?style=social)](https://github.com/BuyWhere/buywhere-mcp)
+[![Smithery](https://smithery.ai/badge/@BuyWhere/buywhere-mcp)](https://smithery.ai/server/@BuyWhere/buywhere-mcp)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-published-blue)](https://github.com/modelcontextprotocol/registry)
 
-**Cross-border product catalog for AI agents.** Search and compare products from Singapore, SEA, and US markets — via [Model Context Protocol](https://modelcontextprotocol.io).
+---
+
+Cross-border product catalog for AI agents. Search and compare products from Singapore, SEA, and US markets via [Model Context Protocol](https://modelcontextprotocol.io).
 
 Works with Claude Desktop, Cursor, VS Code Copilot, Cline, OpenCode, Codex, and any MCP-compatible client.
 
 ---
+
+## Demo
+
+```
+User:   "Find me wireless earbuds under $50 available in Singapore"
+Agent:  [calls search_products(query="wireless earbuds under $50", country="sg")]
+        → Returns 5 products with prices, availability, and purchase links
+User:   "Compare the top 3"
+Agent:  [calls compare_prices(["prod_1", "prod_2", "prod_3"])]
+        → Returns side-by-side comparison with price range and best-value pick
+```
 
 ## Quick Start
 
@@ -26,17 +41,20 @@ Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 |------|-------------|
 | `search_products` | Search catalog by keyword, category, price, region |
 | `get_product` | Full product details by ID (prices, specs, images) |
-| `compare_products` | Side-by-side comparison of 2–5 products |
-| `get_deals` | Current price drops and promotions across markets |
-| `list_categories` | Available product category taxonomy |
+| `compare_prices` | Side-by-side comparison of 2–5 products |
+| `get_price` | Current prices across all merchants for one product |
+| `get_affiliate_link` | Click-tracked affiliate URL for a product |
+| `get_catalog` | Available product category taxonomy |
 
 ## Use Cases
 
-- **AI agents** — search, compare, and recommend products across Singapore, Southeast Asia, and US markets in real time
+- **AI agents** — search, compare, and recommend products across Singapore, SEA, and US markets in real time
 - **Developers** — add cross-border shopping capability to any MCP-compatible app with zero API integration
 - **Price comparison** — get multi-market pricing in a single query across Lazada, Shopee, Amazon, and local retailers
 
-## Claude Desktop Setup
+## Quick Setup
+
+### Claude Desktop
 
 Add to `claude_desktop_config.json`:
 
@@ -46,15 +64,13 @@ Add to `claude_desktop_config.json`:
     "buywhere": {
       "command": "npx",
       "args": ["-y", "@buywhere/mcp-server"],
-      "env": {
-        "BUYWHERE_API_KEY": "bw_live_xxxx"
-      }
+      "env": { "BUYWHERE_API_KEY": "bw_live_xxxx" }
     }
   }
 }
 ```
 
-## Cursor / VS Code / Cline
+### Cursor / VS Code / Cline
 
 Same config — add to your MCP settings file:
 
@@ -64,9 +80,7 @@ Same config — add to your MCP settings file:
     "buywhere": {
       "command": "npx",
       "args": ["-y", "@buywhere/mcp-server"],
-      "env": {
-        "BUYWHERE_API_KEY": "bw_live_xxxx"
-      }
+      "env": { "BUYWHERE_API_KEY": "bw_live_xxxx" }
     }
   }
 }
@@ -112,6 +126,19 @@ BuyWhere is the first cross-border product catalog API built for AI agents. We a
 ## A2A Protocol
 
 BuyWhere also supports the [Agent-to-Agent (A2A)](https://github.com/google/A2A) protocol for multi-agent task delegation. View our Agent Card at `/.well-known/agent.json`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues, submit PRs, and suggest features.
+
+## Support
+
+If you find this project useful:
+
+- ⭐ **Star the repo** — it helps others discover BuyWhere
+- 🐛 [Open an issue](https://github.com/BuyWhere/buywhere-mcp/issues/new) for bugs or feature requests
+- 💬 [Start a discussion](https://github.com/BuyWhere/buywhere-mcp/discussions) for questions or ideas
+- 📣 Share it with other developers who build AI agent tools
 
 ## License
 
