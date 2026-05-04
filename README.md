@@ -17,13 +17,16 @@ Works with Claude Desktop, Cursor, VS Code Copilot, Cline, OpenCode, Codex, and 
 
 ## Demo
 
-```
+![BuyWhere MCP in Claude Desktop](https://raw.githubusercontent.com/BuyWhere/buywhere-mcp/main/public/assets/demo/buywhere-mcp-claude-desktop.gif)
+
+*44-second demo: product search, deal discovery, price comparison, and multi-region support.*
+
+```text
 User:   "Find me wireless earbuds under $50 available in Singapore"
-Agent:  [calls search_products(query="wireless earbuds under $50", country="sg")]
-        → Returns 5 products with prices, availability, and purchase links
+Agent:  [calls search_products → returns 5 matching products]
+
 User:   "Compare the top 3"
-Agent:  [calls compare_prices(["prod_1", "prod_2", "prod_3"])]
-        → Returns side-by-side comparison with price range and best-value pick
+Agent:  [calls compare_prices → side-by-side with best-value pick]
 ```
 
 ## Quick Start
