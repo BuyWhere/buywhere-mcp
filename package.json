@@ -2,9 +2,36 @@
   "name": "buywhere-mcp",
   "version": "1.0.0",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
-  "description": "BuyWhere MCP server — product catalog tools for Claude Desktop, Cursor, and other MCP-compatible agents",
-  "keywords": ["buywhere", "mcp", "model-context-protocol", "product-catalog", "ecommerce", "ai-agent", "singapore"],
+  "description": "BuyWhere MCP server — cross-border product search and price comparison for AI agents. Search & compare products from Singapore, SEA, and US markets via Model Context Protocol.",
+  "keywords": [
+    "buywhere",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "product-search",
+    "price-comparison",
+    "compare-prices",
+    "shopping",
+    "shopping-assistant",
+    "product-catalog",
+    "ecommerce",
+    "cross-border",
+    "southeast-asia",
+    "singapore",
+    "ai-agent",
+    "claude-desktop",
+    "cursor",
+    "claude",
+    "open-code"
+  ],
   "homepage": "https://buywhere.ai",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/BuyWhere"
+  },
+  "bugs": {
+    "url": "https://github.com/BuyWhere/buywhere-mcp/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/BuyWhere/buywhere-mcp"
