@@ -29,6 +29,9 @@ export declare function createSandboxServer(): Server<{
         _meta?: {
             [x: string]: unknown;
             progressToken?: string | number | undefined;
+            "io.modelcontextprotocol/related-task"?: {
+                taskId: string;
+            } | undefined;
         } | undefined;
     } | undefined;
 }, {
@@ -37,12 +40,20 @@ export declare function createSandboxServer(): Server<{
         [x: string]: unknown;
         _meta?: {
             [x: string]: unknown;
+            progressToken?: string | number | undefined;
+            "io.modelcontextprotocol/related-task"?: {
+                taskId: string;
+            } | undefined;
         } | undefined;
     } | undefined;
 }, {
     [x: string]: unknown;
     _meta?: {
         [x: string]: unknown;
+        progressToken?: string | number | undefined;
+        "io.modelcontextprotocol/related-task"?: {
+            taskId: string;
+        } | undefined;
     } | undefined;
 }>;
 //# sourceMappingURL=index.d.ts.map
