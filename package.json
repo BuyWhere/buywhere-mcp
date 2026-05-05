@@ -1,6 +1,6 @@
 {
-  "name": "buywhere-mcp",
-  "version": "1.0.0",
+  "name": "@buywhere/mcp-server",
+  "version": "0.3.6",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
   "description": "BuyWhere MCP server — cross-border product search and price comparison for AI agents. Search & compare products from Singapore, SEA, and US markets via Model Context Protocol.",
   "keywords": [
@@ -34,25 +34,37 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BuyWhere/buywhere-mcp"
+    "url": "git+https://github.com/BuyWhere/buywhere-mcp.git"
   },
   "license": "MIT",
+  "author": "BuyWhere",
   "type": "module",
+  "main": "./dist/index.js",
   "bin": {
-    "buywhere-mcp": "./dist/index.js"
+    "buywhere-mcp-server": "./dist/index.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
-    "start": "node dist/index.js"
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.10.1"
+    "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
-    "typescript": "5.4.5",
-    "@types/node": "20.12.0"
+    "typescript": "^5.9.3",
+    "@types/node": "^20.0.0"
   },
   "engines": {
     "node": ">=18"
