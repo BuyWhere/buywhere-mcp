@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.BuyWhere/buywhere-mcp",
   "title": "BuyWhere MCP",
-  "description": "BuyWhere MCP \u2014 cross-border product search and price comparison API for AI agents. Singapore, SEA, US.",
+  "description": "BuyWhere MCP \u2014 cross-border product search & price comparison. Singapore, SEA, US markets.",
   "repository": {
     "url": "https://github.com/BuyWhere/buywhere-mcp",
     "source": "github"
@@ -19,7 +19,7 @@
       "environmentVariables": [
         {
           "name": "BUYWHERE_API_KEY",
-          "description": "BuyWhere API key used for authenticated product catalog requests.",
+          "description": "BuyWhere API key for authenticated product catalog requests.",
           "isRequired": true,
           "isSecret": true,
           "format": "string"
