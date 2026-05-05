@@ -2,17 +2,17 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.BuyWhere/buywhere-mcp",
   "title": "BuyWhere MCP",
-  "description": "BuyWhere MCP server — cross-border product search and price comparison for AI agents. Singapore, SEA, US markets.",
+  "description": "Cross-border product search & price comparison via MCP. Singapore, SEA, US.",
   "repository": {
     "url": "https://github.com/BuyWhere/buywhere-mcp",
     "source": "github"
   },
-  "version": "1.0.1",
+  "version": "1.0.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@buywhere/mcp-server",
-      "version": "0.3.4",
+      "version": "0.3.6",
       "transport": {
         "type": "stdio"
       },
