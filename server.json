@@ -2,35 +2,40 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.BuyWhere/buywhere-mcp",
   "title": "BuyWhere MCP",
-<<<<<<< Updated upstream
-  "description": "BuyWhere MCP \u2014 cross-border product search & price comparison. Singapore, SEA, US markets.",
+  "description": "Open-source MCP server for AI agent commerce. Search 50M+ products across 6 markets (SG, US, JP, KR, CN, AU).",
+  "version": "0.3.7",
   "repository": {
     "url": "https://github.com/BuyWhere/buywhere-mcp",
     "source": "github"
   },
-  "version": "1.0.3",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@buywhere/mcp-server",
-      "version": "0.3.6",
+      "version": "0.3.7",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
-          "name": "BUYWHERE_API_KEY",
-          "description": "BuyWhere API key for authenticated product catalog requests.",
+          "description": "Your BuyWhere API key",
           "isRequired": true,
+          "format": "string",
           "isSecret": true,
-          "format": "string"
-        },
+          "name": "BUYWHERE_API_KEY"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.buywhere.ai/mcp",
+      "headers": [
         {
-          "name": "BUYWHERE_API_URL",
-          "description": "Optional override for the BuyWhere API base URL.",
-          "isRequired": false,
-          "isSecret": false,
-          "format": "string"
+          "name": "Authorization",
+          "description": "API key for BuyWhere authentication",
+          "isSecret": true
         }
       ]
     }
