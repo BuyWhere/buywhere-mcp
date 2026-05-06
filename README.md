@@ -39,6 +39,11 @@ npx -y @buywhere/mcp-server
 
 Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 
+## Tutorials
+
+- **[Part 1: MCP for Ecommerce — The Missing Infrastructure Layer for AI Agent Shopping](https://dev.to/buywhere/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping-1i7d)** — Understanding the architecture and why agents need a product catalog API
+- **[Part 2: Build a Real Shopping Agent in 15 Minutes](https://dev.to/buywhere/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-4f5b)** — Hands-on tutorial: set up the MCP server, search products, compare prices, build a working agent
+
 ## Tools
 
 | Tool | Description |
