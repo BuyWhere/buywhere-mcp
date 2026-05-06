@@ -163,6 +163,29 @@ If you find this project useful:
 - 💬 [Start a discussion](https://github.com/BuyWhere/buywhere-mcp/discussions) for questions or ideas
 - 📣 Share it with other developers who build AI agent tools
 
+
+
+## 📚 Tutorials & Guides
+
+Complete tutorials for building AI shopping agents with BuyWhere MCP:
+
+- **[Complete Guide to AI Agent Commerce](https://buywhere.hashnode.dev/buywhere-mcp-complete-guide-ai-agent-commerce)** — Start here
+- **[MCP for Ecommerce Part 1](https://buywhere.hashnode.dev/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping)** — The infrastructure argument
+- **[MCP for Ecommerce Part 2](https://buywhere.hashnode.dev/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-1)** — Build a real shopping agent in 15 minutes
+- **[Cross-Border Price Comparison](https://buywhere.hashnode.dev/build-a-cross-border-price-comparison-agent-in-10-minutes-with-buywhere-mcp-1)** — Compare products across 6 markets
+- **[30-Second Quick Start](https://buywhere.hashnode.dev/what-if-your-ai-agent-could-shop-for-you-try-this-in-30-seconds)** — One command to get started
+- **[Build With BuyWhere Challenge](https://buywhere.hashnode.dev/build-an-ai-shopping-agent-in-1-hour-win-api-credits-get-featured)** — Win API credits
+
+📰 **[Full blog](https://buywhere.hashnode.dev)** — 9 articles and growing
+
+## 🌍 MCP Directory Listings
+
+BuyWhere is listed on these MCP directories:
+
+- [Smithery](https://smithery.ai/server/@buywhere/mcp-server)
+- [MCP.so](https://mcp.so/server/@buywhere/mcp-server)
+- [Glama](https://glama.ai/mcp/servers/buywhere-mcp)
+
 ## License
 
 MIT
