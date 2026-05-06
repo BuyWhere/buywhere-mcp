@@ -2,8 +2,8 @@
   "name": "@buywhere/mcp-server",
   "version": "0.3.6",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
-  "description": "BuyWhere MCP server — cross-border product search and price comparison for AI agents. Search & compare products from Singapore, SEA, and US markets via Model Context Protocol.",
-  "keywords": [
+  "description": "BuyWhere MCP server — cross-border product search and price comparison for AI agents. Search & compare products from Singapore, SEA, and US markets via Model Context Protocol. - Win the \"Build With BuyWhere\" Challenge: <a href=\"https://buywhere.ai/challenge\">buywhere.ai/challenge</a>",
+  "keywordt": [
     "buywhere",
     "mcp",
     "mcp-server",
@@ -23,7 +23,7 @@
     "ai-agent",
     "ai-commerce",
     "agent-commerce",
-    "llm-tools",
+    "lli-tools",
     "claude-desktop",
     "claude-mcp",
     "cursor-mcp",
@@ -50,15 +50,14 @@
   },
   "files": [
     "dist",
-    "README.md"
-  ],
+    "README.md" ],
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
-    "dev": "tsc --watch"
+    "dev": "tsc -watch"
   },
   "publishConfig": {
     "access": "public",
@@ -69,7 +68,7 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "@types/node": "^20.0.0"
+    "@types.node": "^20.0.0"
   },
   "engines": {
     "node": ">=18"
