@@ -1,5 +1,86 @@
-# Smithery configuration for BuyWhere MCP server
-# https://smithery.ai/docs/build/publish
+# Smithery MCP server manifest — https://smithery.ai
+# BuyWhere: Agent-native product catalog API for Southeast Asia commerce
+
+name: buywhere
+displayName: BuyWhere MCP Server
+description: >
+  Agent-native product catalog API for Southeast Asia commerce. Search 1.5M+ products across Shopee,
+  Lazada, Amazon SG, Amazon US, Walmart, Carousell, FairPrice, Harvey Norman, and 20+ e-commerce
+  platforms. Compare prices across merchants, find deals, and browse categories — all through a
+  single MCP endpoint. No scraping, no multi-API spaghetti.
+
+version: 1.0.0
+license: MIT
+
+mcp:
+  transport: http
+  url: https://mcp.buywhere.ai/mcp
+  authentication:
+    type: bearer
+    description: >
+      API key required. Get a free key at https://api.buywhere.ai/v1/auth/register.
+      Free tier: 1,000 calls/month. No credit card required.
+
+tools:
+  - name: search_products
+    description: >
+      Search the BuyWhere product catalog by keyword. Returns products from e-commerce platforms
+      across multiple regions (Singapore, US, etc.). Use compact=true for agent-optimized responses.
+
+  - name: get_product
+    description: >
+      Get a specific product by its ID, including full details and current price.
+
+  - name: compare_products
+    description: >
+      Compare multiple products side-by-side across merchants. Returns price, brand, rating,
+      category path, and merchant for each product.
+
+  - name: get_deals
+    description: >
+      Get discounted products sorted by discount percentage across all merchants. Returns
+      products with original price, current price, and discount percentage.
+
+  - name: list_categories
+    description: >
+      List top-level product categories available in the BuyWhere catalog. Returns category
+      slugs, names, and product counts.
+
+  - name: find_best_price
+    description: >
+      Find the single cheapest listing for a product across all Singapore and SEA
+      e-commerce platforms. Returns the platform, price, and URL for the lowest available price.
+
+categories:
+  - Commerce
+  - Shopping
+  - Price Comparison
+  - Singapore
+  - Southeast Asia
+
+keywords:
+  - shopping
+  - ecommerce
+  - price comparison
+  - product search
+  - singapore
+  - southeast asia
+  - shopee
+  - lazada
+  - amazon
+  - deals
+  - ai agent
+  - mcp
+  - commerce api
+
+author:
+  name: BuyWhere
+  email: api@buywhere.ai
+  url: https://buywhere.ai
+
+homepage: https://buywhere.ai
+documentation: https://api.buywhere.ai/docs/guides/mcp
+repository: https://github.com/BuyWhere/buywhere-mcp
 
 startCommand:
   type: node
@@ -19,3 +100,29 @@ startCommand:
       env: config.apiKey ? { BUYWHERE_API_KEY: config.apiKey } : {}
     })
 
+supported_clients:
+  - Claude Desktop
+  - Cursor
+  - VS Code Copilot
+  - Custom MCP agents
+  - LangChain
+  - CrewAI
+  - AutoGen
+  - Gemini
+
+regions:
+  - Singapore (SG)
+  - United States (US)
+  - Vietnam (VN)
+  - Thailand (TH)
+  - Malaysia (MY)
+
+features:
+  - Real-time product search across 1.5M+ products
+  - Cross-merchant price comparison
+  - Discount/deal discovery
+  - Category browsing
+  - Multi-currency support (SGD, USD, MYR, IDR, THB, PHP, VND)
+  - Region-filtered search
+  - Compact JSON mode for AI agents
+  - Free tier available (1,000 calls/month)
