@@ -3,7 +3,7 @@
   "version": "0.3.6",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
   "description": "BuyWhere MCP server — cross-border product search and price comparison for AI agents. Search & compare products from Singapore, SEA, and US markets via Model Context Protocol. - Win the \"Build With BuyWhere\" Challenge: <a href=\"https://buywhere.ai/challenge\">buywhere.ai/challenge</a>",
-  "keywordt": [
+  "keywords": [
     "buywhere",
     "mcp",
     "mcp-server",
