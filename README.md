@@ -1,12 +1,26 @@
 # BuyWhere MCP Server
 
-[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Launched%20May%206-%23DA552E?logo=producthunt&logoColor=white)](https://www.producthunt.com/posts/buywhere-mcp-server)
+[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Launched%20May%206-%23DA552E?logo=producthunt&logOColor=white)](https://www.producthunt.com/posts/buywhere-mcp-server)
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub stars](https://img.shields.io/github/stars/BuyWhere/buywhere-mcp?style=social)](https://github.com/BuyWhere/buywhere-mcp)
 [![Smithery](https://smithery.ai/badge/@BuyWhere/buywhere-mcp)](https://smithery.ai/server/@BuyWhere/buywhere-mcp)
 [![MCP Registry](https://img.shields.io/badge/MCP%20Registry-published-blue)](https://github.com/modelcontextprotocol/registry)
+
+---
+
+## Build With BuyWhere Challenge
+
+**$5,000 in prizes — Build AI agents that shop smarter**
+
+Join the "Build With BuyWhere" AI Agent Developer Challenge! Use the BuyWhere MCP server to create AI agents that search, compare, and recommend products across Singapore, SEA, and US markets.
+
+- **Prize pool:** $5,000 USD
+- **Deadline:** June 30, 2026
+- **Challenge page:** [buywhere.ai/challenge](https://buywhere.ai/challenge)
+
+Build a shopping agent, price comparison tool, deal finder, or any creative AI agent use case. Winners get cash prizes and featured promotion on BuyWhere channels.
 
 ---
 
