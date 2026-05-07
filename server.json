@@ -12,7 +12,7 @@
     {
       "registryType": "npm",
       "identifier": "@buywhere/mcp-server",
-      "version": "0.3.6",
+      "version": "0.3.10",
       "transport": {
         "type": "stdio"
       },
