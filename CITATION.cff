@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software in your AI agent, please cite it as below."
+title: "BuyWhere MCP Server"
+abstract: "Product search and cross-border price comparison API for AI agents via Model Context Protocol. Search 50M+ products across 6 markets."
+authors:
+  - name: "BuyWhere"
+    website: "https://buywhere.ai"
+repository-code: "https://github.com/BuyWhere/buywhere-mcp"
+url: "https://buywhere.ai"
+keywords:
+  - "mcp"
+  - "model-context-protocol"
+  - "product-search"
+  - "price-comparison"
+  - "ai-agent"
+  - "agent-commerce"
+  - "catalog-api"
+license: MIT
+date-released: "2026-01-15"
+version: "0.3.8"
