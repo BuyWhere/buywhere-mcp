@@ -1,0 +1,42 @@
+# BuyWhere MCP Server
+
+> Product search and cross-border price comparison API for AI agents. 50M+ products across 6 markets (Singapore, US, Japan, Korea, China, Australia). npm: @buywhere/mcp-server. MCP Registry: io.github.BuyWhere/buywhere-mcp.
+
+## Quick Start
+
+```bash
+npx -y @buywhere/mcp-server
+```
+
+## MCP Tools
+
+- search_products: Search 50M+ products by keyword, market, price range
+- get_product: Full product details, merchants, affiliate links
+- compare_products: Cross-market price comparison
+- get_deals: Active deals and promotions
+- list_categories: Product category taxonomy
+
+## Configuration
+
+```json
+{
+  "mcpServers": {
+    "buywhere": {
+      "command": "npx",
+      "args": ["-y", "@buywhere/mcp-server"],
+      "env": {"BUYWHERE_API_KEY": "your-key"}
+    }
+  }
+}
+```
+
+## Links
+
+- Website: https://buywhere.ai
+- API Key: https://buywhere.ai/api-keys
+- npm: https://www.npmjs.com/package/@buywhere/mcp-server
+- GitHub: https://github.com/BuyWhere/buywhere-mcp
+- MCP Registry: io.github.BuyWhere/buywhere-mcp
+- Glama: https://glama.ai/mcp/servers/BuyWhere/buywhere-mcp
+- Smithery: https://smithery.ai/server/@buywhere/mcp-server
+- MCP.so: https://mcp.so/server/@buywhere/mcp-server
