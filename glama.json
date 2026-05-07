@@ -2,5 +2,10 @@
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "maintainers": [
     "BuyWhere"
+  ],
+  "categories": [
+    "AI & Machine Learning",
+    "Developer Tools",
+    "Product Search"
   ]
 }

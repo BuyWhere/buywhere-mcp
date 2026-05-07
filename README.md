@@ -24,7 +24,7 @@ Build a shopping agent, price comparison tool, deal finder, or any creative AI a
 
 ---
 
-Cross-border product catalog for AI agents. Search and compare products from Singapore, SEA, and US markets via [Model Context Protocol](https://modelcontextprotocol.io).
+Product search API for AI agents via [Model Context Protocol](https://modelcontextprotocol.io). Search & compare 11M+ products across Singapore, SEA, and US markets — built for AI agent commerce, not store management.
 
 Works with Claude Desktop, Cursor, VS Code Copilot, Cline, OpenCode, Codex, and any MCP-compatible client.
 
@@ -139,7 +139,7 @@ npm start
 
 ## Why BuyWhere?
 
-BuyWhere is the first cross-border product catalog API built for AI agents. We aggregate products from Singapore, Southeast Asia, and US markets into a single, agent-friendly interface.
+BuyWhere is a product search API for AI agents. We aggregate 11M+ products from Singapore, Southeast Asia, and US markets into a single, agent-friendly interface — no store management, no Shopify integration. Just search and compare products in real time.
 
 - **One API** — all markets, all retailers
 - **Agent-native** — built for MCP from day one

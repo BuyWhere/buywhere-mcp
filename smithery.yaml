@@ -2,12 +2,12 @@
 # BuyWhere: Agent-native product catalog API for Southeast Asia commerce
 
 name: buywhere
-displayName: BuyWhere MCP Server
+displayName: BuyWhere — AI Product Search API
 description: >
-  Agent-native product catalog API for Southeast Asia commerce. Search 1.5M+ products across Shopee,
-  Lazada, Amazon SG, Amazon US, Walmart, Carousell, FairPrice, Harvey Norman, and 20+ e-commerce
-  platforms. Compare prices across merchants, find deals, and browse categories — all through a
-  single MCP endpoint. No scraping, no multi-API spaghetti.
+  Product search API for AI agents via MCP. Search 11M+ products across Shopee, Lazada,
+  Amazon SG, Amazon US, Walmart, Carousell, FairPrice, Harvey Norman, and 20+ retailers.
+  Compare prices across merchants, find deals, and browse categories — all through a single
+  MCP endpoint. Built for AI agent commerce, not store management.
 
 version: 1.0.0
 license: MIT
@@ -52,17 +52,18 @@ tools:
       e-commerce platforms. Returns the platform, price, and URL for the lowest available price.
 
 categories:
-  - Commerce
-  - Shopping
+  - AI & Machine Learning
+  - Developer Tools
   - Price Comparison
+  - Product Search
   - Singapore
   - Southeast Asia
 
 keywords:
-  - shopping
-  - ecommerce
-  - price comparison
   - product search
+  - product search api
+  - price comparison
+  - catalog api
   - singapore
   - southeast asia
   - shopee
@@ -71,7 +72,7 @@ keywords:
   - deals
   - ai agent
   - mcp
-  - commerce api
+  - agent commerce
 
 author:
   name: BuyWhere
