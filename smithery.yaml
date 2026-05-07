@@ -2,77 +2,74 @@
 # BuyWhere: Agent-native product catalog API for Southeast Asia commerce
 
 name: buywhere
-displayName: BuyWhere — AI Product Search API
+displayName: BuyWhere MCP Server
 description: >
-  Product search API for AI agents via MCP. Search 11M+ products across Shopee, Lazada,
-  Amazon SG, Amazon US, Walmart, Carousell, FairPrice, Harvey Norman, and 20+ retailers.
-  Compare prices across merchants, find deals, and browse categories — all through a single
-  MCP endpoint. Built for AI agent commerce, not store management.
+  Agent-native product catalog API. Search products across Shopee, Lazada, Amazon SG,
+  Amazon US, Walmart, Carousell, FairPrice, Harvey Norman, and 20+ e-commerce platforms.
+  Compare prices across merchants, browse categories, and get affiliate links — all through
+  a single MCP endpoint.
 
 version: 1.0.0
 license: MIT
 
 mcp:
-  transport: http
-  url: https://mcp.buywhere.ai/mcp
+  transport: stdio
   authentication:
     type: bearer
     description: >
-      API key required. Get a free key at https://api.buywhere.ai/v1/auth/register.
+      API key required. Get a free key at https://buywhere.ai/dashboard.
       Free tier: 1,000 calls/month. No credit card required.
 
 tools:
   - name: search_products
     description: >
-      Search the BuyWhere product catalog by keyword. Returns products from e-commerce platforms
-      across multiple regions (Singapore, US, etc.). Use compact=true for agent-optimized responses.
+      Search the BuyWhere product catalog using keywords or natural language.
+      Returns matching products with title, price, availability, merchant, and URL.
 
   - name: get_product
     description: >
-      Get a specific product by its ID, including full details and current price.
+      Fetch full details for a single product by its BuyWhere product ID.
 
-  - name: compare_products
+  - name: get_price
     description: >
-      Compare multiple products side-by-side across merchants. Returns price, brand, rating,
-      category path, and merchant for each product.
+      Get current prices for a product across all available merchants.
+      Returns a ranked list of listings with price, shipping, merchant rating, and stock status.
 
-  - name: get_deals
+  - name: compare_prices
     description: >
-      Get discounted products sorted by discount percentage across all merchants. Returns
-      products with original price, current price, and discount percentage.
+      Compare 2–5 products side-by-side. Returns structured differentiators,
+      price range, pros/cons, and a best-value recommendation.
 
-  - name: list_categories
+  - name: get_affiliate_link
     description: >
-      List top-level product categories available in the BuyWhere catalog. Returns category
-      slugs, names, and product counts.
+      Get the click-tracked BuyWhere affiliate link for a product.
+      Share this with users — it logs the referral and redirects to the merchant page.
 
-  - name: find_best_price
+  - name: get_catalog
     description: >
-      Find the single cheapest listing for a product across all Singapore and SEA
-      e-commerce platforms. Returns the platform, price, and URL for the lowest available price.
+      List available product categories in the BuyWhere catalog.
+      Use this to discover what categories exist before searching or filtering.
 
 categories:
-  - AI & Machine Learning
-  - Developer Tools
+  - Commerce
+  - Shopping
   - Price Comparison
-  - Product Search
   - Singapore
   - Southeast Asia
 
 keywords:
-  - product search
-  - product search api
+  - shopping
+  - ecommerce
   - price comparison
-  - catalog api
+  - product search
   - singapore
   - southeast asia
   - shopee
   - lazada
   - amazon
-  - deals
   - ai agent
   - mcp
-  - agent commerce
+  - commerce api
 
 author:
   name: BuyWhere
