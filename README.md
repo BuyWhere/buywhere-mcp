@@ -1,6 +1,5 @@
 # BuyWhere MCP Server
 
-[![Product Hunt](https://img.shields.io/badge/Product%20Hunt-Launched%20May%206-%23DA552E?logo=producthunt&logOColor=white)](https://www.producthunt.com/posts/buywhere-mcp-server)
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
