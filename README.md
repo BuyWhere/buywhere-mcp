@@ -57,6 +57,16 @@ Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 - **[Part 1: MCP for Ecommerce — The Missing Infrastructure Layer for AI Agent Shopping](https://dev.to/buywhere/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping-1i7d)** — Understanding the architecture and why agents need a product catalog API
 - **[Part 2: Build a Real Shopping Agent in 15 Minutes](https://dev.to/buywhere/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-4f5b)** — Hands-on tutorial: set up the MCP server, search products, compare prices, build a working agent
 
+## Blog
+
+Read the **[BuyWhere Engineering Blog](https://buywhere.ai/blog)** for deep dives on MCP architecture, agent commerce, and the ecosystem.
+
+- **[MCP for Ecommerce 2026](https://buywhere.ai/blog/mcp-for-ecommerce-2026)** — How AI agents search real products, compare prices across markets, and why MCP is the standard
+- **[Building Production MCP Servers](https://buywhere.ai/blog/building-production-mcp-servers)** — Architecture, tool design patterns, and distribution from 0 to 1,700+ daily npm downloads
+- **[MCP Server Ecosystem 2026](https://buywhere.ai/blog/mcp-server-ecosystem-2026)** — Every MCP category mapped (4,800+ servers across 40+ domains)
+- **[AI Agent Commerce: Missing Infrastructure](https://buywhere.ai/blog/ai-agent-commerce-missing-infrastructure)** — Why shopping is the last unbuilt layer of the agent-native economy
+- **[Cross-Border Price Comparison Tutorial](https://buywhere.ai/blog/cross-border-price-comparison-agent-tutorial)** — Build a shopping agent in 10 minutes with BuyWhere MCP
+
 ## Tools
 
 | Tool | Description |
