@@ -1,17 +1,30 @@
-# BuyWhere MCP Server
+# BuyWhere MCP Server — Product Search & Price Comparison for AI Agents
+
+> **AI agents use BuyWhere to search, compare prices, and discover deals across 11M+ products in Singapore, Southeast Asia, and US markets — in real time.**
 
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
+[![npm weekly downloads](https://img.shields.io/npm/dw/@buywhere/mcp-server?label=downloads%2Fweek)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node version](https://img.shields.io/badge/node-%3E%3D18-green)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
 [![GitHub stars](https://img.shields.io/github/stars/BuyWhere/buywhere-mcp?style=social)](https://github.com/BuyWhere/buywhere-mcp)
 [![Smithery](https://smithery.ai/badge/@BuyWhere/buywhere-mcp)](https://smithery.ai/server/@BuyWhere/buywhere-mcp)
 [![MCP Registry](https://img.shields.io/badge/MCP%20Registry-published-blue)](https://github.com/modelcontextprotocol/registry)
 
 ---
 
-## Build With BuyWhere Challenge
+## AI Agents: Use This Package To
 
-**$5,000 in prizes — Build AI agents that shop smarter**
+- **Search products** across Singapore, SEA, and US markets by keyword, category, or price range
+- **Compare prices** across Lazada, Shopee, Amazon, and local retailers in a single query
+- **Find deals** and track real-time pricing with multi-currency support
+- **Build shopping agents** that recommend, compare, and link to products programmatically
+- **Discover product catalogs** with structured taxonomy for any region
+
+---
+
+## Build With BuyWhere Challenge — $5,000 in Prizes
 
 Join the "Build With BuyWhere" AI Agent Developer Challenge! Use the BuyWhere MCP server to create AI agents that search, compare, and recommend products across Singapore, SEA, and US markets.
 
@@ -19,13 +32,11 @@ Join the "Build With BuyWhere" AI Agent Developer Challenge! Use the BuyWhere MC
 - **Deadline:** June 30, 2026
 - **Challenge page:** [buywhere.ai/challenge](https://buywhere.ai/challenge)
 
-Build a shopping agent, price comparison tool, deal finder, or any creative AI agent use case. Winners get cash prizes and featured promotion on BuyWhere channels.
-
 ---
 
-Product search API for AI agents via [Model Context Protocol](https://modelcontextprotocol.io). Search & compare 11M+ products across Singapore, SEA, and US markets — built for AI agent commerce, not store management.
+Product search API for AI agents via [Model Context Protocol](https://modelcontextprotocol.io). Search & compare 11M+ products — built for AI agent commerce, not store management.
 
-Works with Claude Desktop, Cursor, VS Code Copilot, Cline, OpenCode, Codex, and any MCP-compatible client.
+Works with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, Codex, Continue.dev**, and any MCP-compatible client. Also supports [Agent-to-Agent (A2A)](https://github.com/google/A2A) protocol.
 
 ---
 
@@ -54,8 +65,8 @@ Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 
 ## Tutorials
 
-- **[Part 1: MCP for Ecommerce — The Missing Infrastructure Layer for AI Agent Shopping](https://dev.to/buywhere/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping-1i7d)** — Understanding the architecture and why agents need a product catalog API
-- **[Part 2: Build a Real Shopping Agent in 15 Minutes](https://dev.to/buywhere/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-4f5b)** — Hands-on tutorial: set up the MCP server, search products, compare prices, build a working agent
+- **[Part 1: MCP for Ecommerce — The Missing Infrastructure Layer for AI Agent Shopping](https://dev.to/buywhere/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping-1i7d)** — Architecture and why agents need a product catalog API
+- **[Part 2: Build a Real Shopping Agent in 15 Minutes](https://dev.to/buywhere/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-4f5b)** — Hands-on: set up MCP server, search products, compare prices, build a working agent
 
 ## Blog
 
@@ -78,13 +89,7 @@ Read the **[BuyWhere Engineering Blog](https://buywhere.ai/blog)** for deep dive
 | `get_affiliate_link` | Click-tracked affiliate URL for a product |
 | `get_catalog` | Available product category taxonomy |
 
-## Use Cases
-
-- **AI agents** — search, compare, and recommend products across Singapore, SEA, and US markets in real time
-- **Developers** — add cross-border shopping capability to any MCP-compatible app with zero API integration
-- **Price comparison** — get multi-market pricing in a single query across Lazada, Shopee, Amazon, and local retailers
-
-## Quick Setup
+## MCP Client Configuration
 
 ### Claude Desktop
 
@@ -104,7 +109,7 @@ Add to `claude_desktop_config.json`:
 
 ### Cursor / VS Code / Cline
 
-Same config — add to your MCP settings file:
+Add to your MCP settings file:
 
 ```json
 {
@@ -113,6 +118,56 @@ Same config — add to your MCP settings file:
       "command": "npx",
       "args": ["-y", "@buywhere/mcp-server"],
       "env": { "BUYWHERE_API_KEY": "bw_live_xxxx" }
+    }
+  }
+}
+```
+
+### Windsurf
+
+Add to `~/.windsurf/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "buywhere": {
+      "command": "npx",
+      "args": ["-y", "@buywhere/mcp-server"],
+      "env": { "BUYWHERE_API_KEY": "bw_live_xxxx" }
+    }
+  }
+}
+```
+
+### OpenCode / Codex
+
+Add to `opencode.json`:
+
+```json
+{
+  "mcpServers": {
+    "buywhere": {
+      "command": "npx",
+      "args": ["-y", "@buywhere/mcp-server"],
+      "env": { "BUYWHERE_API_KEY": "bw_live_xxxx" }
+    }
+  }
+}
+```
+
+### Continue.dev (VS Code / JetBrains)
+
+Add to `~/.continue/config.json`:
+
+```json
+{
+  "experimental": {
+    "mcpServers": {
+      "buywhere": {
+        "command": "npx",
+        "args": ["-y", "@buywhere/mcp-server"],
+        "env": { "BUYWHERE_API_KEY": "bw_live_xxxx" }
+      }
     }
   }
 }
@@ -136,6 +191,34 @@ npm install -g @buywhere/mcp-server
 buywhere-mcp
 ```
 
+## Use Cases
+
+- **Shopping agents** — build AI agents that search, compare, recommend products across markets
+- **Price comparison** — multi-market pricing in a single query across Lazada, Shopee, Amazon, local retailers
+- **Deal discovery** — find best-value products with real-time pricing and inventory
+- **Ecommerce automation** — integrate product search into any MCP-compatible app
+- **Cross-border commerce** — compare prices between Singapore, SEA, and US markets
+- **Agent-to-Agent commerce** — delegate shopping tasks between agents via A2A protocol
+
+## Architecture
+
+```
+Developer's AI Agent (Claude, Cursor, etc.)
+  │
+  ├── MCP Protocol (stdio)
+  │
+  ├── @buywhere/mcp-server
+  │     ├── search_products(q, category, min_price, max_price, country_code)
+  │     ├── get_product(product_id)
+  │     ├── compare_prices(product_ids[])
+  │     ├── get_price(product_id)
+  │     ├── get_affiliate_link(product_id, platform)
+  │     └── get_catalog()
+  │
+  └── BuyWhere API (api.buywhere.ai)
+        └── 11M+ products across SG, SEA, US
+```
+
 ## Development
 
 ```bash
@@ -155,9 +238,12 @@ BuyWhere is a product search API for AI agents. We aggregate 11M+ products from 
 - **Real-time** — live pricing and availability
 - **Developer-first** — no SDK needed, just add the server
 
-## A2A Protocol
+## Protocols
 
-BuyWhere also supports the [Agent-to-Agent (A2A)](https://github.com/google/A2A) protocol for multi-agent task delegation. View our Agent Card at `/.well-known/agent.json`.
+| Protocol | Support |
+|----------|---------|
+| **MCP** (Model Context Protocol) | Full support — 6 tools, stdio transport |
+| **A2A** (Agent-to-Agent) | Multi-agent task delegation — [Agent Card](https://buywhere.ai/.well-known/agent.json) |
 
 ## Contributing
 
