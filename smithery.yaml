@@ -9,6 +9,9 @@ description: >
   Compare prices across merchants, browse categories, and get affiliate links — all through
   a single MCP endpoint.
 
+  📚 Read our engineering blog at https://buywhere.ai/blog for MCP server guides,
+  ecommerce deep-dives, and agent-native commerce learnings.
+
 version: 1.0.0
 license: MIT
 
@@ -93,7 +96,7 @@ startCommand:
     required: [apiKey]
   commandFunction: |-
     (config) => ({
-      command: "npx",
+      command: "npm",
       args: ["-y", "@buywhere/mcp-server"],
       env: config.apiKey ? { BUYWHERE_API_KEY: config.apiKey } : {}
     })
