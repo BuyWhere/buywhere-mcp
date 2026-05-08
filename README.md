@@ -154,6 +154,17 @@ BuyWhere also supports the [Agent-to-Agent (A2A)](https://github.com/google/A2A)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues, submit PRs, and suggest features.
 
+## Blog
+
+Learn more about MCP servers and the BuyWhere ecosystem:
+
+- [MCP server discovery](https://buywhere.hashnode.dev/the-mcp-server-discovery-gap) — Understanding the MCP server discovery gap
+- [Building production MCP servers](https://buywhere.hashnode.dev/building-production-mcp-servers) — Production best practices for MCP servers
+- [MCP servers that earn their context window](https://buywhere.hashnode.dev/5-mcp-servers-that-earn-context-window) — MCP servers that maximize context window value
+- [MCP ecommerce guide](https://buywhere.hashnode.dev/mcp-for-ecommerce-definitive-guide) — Definitive guide to MCP for ecommerce
+- [BuyWhere MCP launch](https://buywhere.hashnode.dev/buywhere-mcp-goes-live) — Announcing the BuyWhere MCP server launch
+- [MCP server ecosystem 2026](https://buywhere.hashnode.dev/mcp-server-ecosystem-2026-complete-guide) — Complete guide to the MCP server ecosystem in 2026
+
 ## Support
 
 If you find this project useful:
