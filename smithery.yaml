@@ -96,7 +96,7 @@ startCommand:
     required: [apiKey]
   commandFunction: |-
     (config) => ({
-      command: "npm",
+      command: "npx",
       args: ["-y", "@buywhere/mcp-server"],
       env: config.apiKey ? { BUYWHERE_API_KEY: config.apiKey } : {}
     })
