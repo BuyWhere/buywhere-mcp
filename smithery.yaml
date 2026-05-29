@@ -43,6 +43,12 @@ tools:
       Compare 2–5 products side-by-side. Returns structured differentiators,
       price range, pros/cons, and a best-value recommendation.
 
+  - name: price_history
+    description: >
+      Get historical price data for a product to track price trends.
+      Returns a chronological list of price points with dates, helping agents determine
+      if a current price is at an all-time low.
+
   - name: get_affiliate_link
     description: >
       Get the click-tracked BuyWhere affiliate link for a product.
@@ -64,6 +70,8 @@ keywords:
   - shopping
   - ecommerce
   - price comparison
+  - price tracking
+  - price history
   - product search
   - singapore
   - southeast asia
@@ -73,6 +81,7 @@ keywords:
   - ai agent
   - mcp
   - commerce api
+  - deal finder
 
 author:
   name: BuyWhere
@@ -122,6 +131,7 @@ features:
   - Real-time product search across 1.5M+ products
   - Cross-merchant price comparison
   - Discount/deal discovery
+  - Price history tracking — see all-time lows and price trends
   - Category browsing
   - Multi-currency support (SGD, USD, MYR, IDR, THB, PHP, VND)
   - Region-filtered search
