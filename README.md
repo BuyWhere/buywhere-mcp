@@ -72,6 +72,8 @@ Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 
 Read the **[BuyWhere Engineering Blog](https://buywhere.ai/blog)** for deep dives on MCP architecture, agent commerce, and the ecosystem.
 
+Also follow the **[BuyWhere Hashnode blog mirror](https://buywhere.hashnode.dev/)** for the same engineering content on Hashnode.
+
 - **[MCP for Ecommerce 2026](https://buywhere.ai/blog/mcp-for-ecommerce-2026)** — How AI agents search real products, compare prices across markets, and why MCP is the standard
 - **[Building Production MCP Servers](https://buywhere.ai/blog/building-production-mcp-servers)** — Architecture, tool design patterns, and distribution from 0 to 1,700+ daily npm downloads
 - **[MCP Server Ecosystem 2026](https://buywhere.ai/blog/mcp-server-ecosystem-2026)** — Every MCP category mapped (4,800+ servers across 40+ domains)
