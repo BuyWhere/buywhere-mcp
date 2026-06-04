@@ -194,7 +194,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
           country: {
             type: "string",
-            description: "Country code to scope results (e.g. 'sg' for Singapore). Defaults to 'sg'.",
+            description: "Country code to filter results by region. Supported: sg, us, vn, th, my, id. Omit for all regions.",
           },
           category: {
             type: "string",
@@ -330,12 +330,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     const limit = Math.min(Math.max(1, Number(args.limit ?? 10)), 50);
+
+    const SUPPORTED_COUNTRIES = new Set(["sg", "us", "vn", "th", "my", "id"]);
+    const countryRaw = args.country as string | undefined;
+    if (countryRaw !== undefined && countryRaw !== "") {
+      const countryNorm = countryRaw.toLowerCase();
+      if (!SUPPORTED_COUNTRIES.has(countryNorm)) {
+        throw new McpError(
+          ErrorCode.InvalidParams,
+          `Unsupported country code: "${countryRaw}". Supported codes are: sg, us, vn, th, my, id.`,
+        );
+      }
+    }
+    const country = countryRaw ? countryRaw.toLowerCase() : undefined;
+
     const params: Record<string, string | number | undefined> = {
       q: query,
       limit,
       availability: "in_stock",
       sort: "relevance",
     };
+    if (country) params.country_code = country;
     if (args.category) params.category = args.category as string;
 
     const data = (await apiFetch("/v1/products/search", params)) as Record<string, unknown>;

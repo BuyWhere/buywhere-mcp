@@ -11,6 +11,7 @@
  *   get_product       — fetch a single product by ID
  *   get_price         — compare prices for a product across all merchants
  *   compare_prices    — side-by-side comparison of 2–5 products
+ *   price_history     — retrieve historical price trends for a product
  *   get_affiliate_link — get the click-tracked affiliate URL for a product
  *   get_catalog       — list available product categories
  *
@@ -152,7 +153,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                     },
                     country: {
                         type: "string",
-                        description: "Country code to scope results (e.g. 'sg' for Singapore). Defaults to 'sg'.",
+                        description: "Country code to filter results by region. Supported: sg, us, vn, th, my, id. Omit for all regions.",
                     },
                     category: {
                         type: "string",
@@ -216,6 +217,26 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             },
         },
         {
+            name: "price_history",
+            description: "Get historical price data for a product to track price trends. " +
+                "Returns a chronological list of price points with dates, helping agents determine if a current price is at an all-time low.",
+            inputSchema: {
+                type: "object",
+                properties: {
+                    product_id: {
+                        type: "string",
+                        description: "The BuyWhere product ID",
+                    },
+                    days: {
+                        type: "integer",
+                        description: "Number of days of history to retrieve (e.g. 30, 90, 365). Defaults to 90.",
+                        default: 90,
+                    },
+                },
+                required: ["product_id"],
+            },
+        },
+        {
             name: "get_affiliate_link",
             description: "Get the click-tracked BuyWhere affiliate link for a product. " +
                 "Share this link with users — it logs the referral and redirects to the merchant page. " +
@@ -259,12 +280,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             throw new McpError(ErrorCode.InvalidParams, "query is required");
         }
         const limit = Math.min(Math.max(1, Number(args.limit ?? 10)), 50);
+        const SUPPORTED_COUNTRIES = new Set(["sg", "us", "vn", "th", "my", "id"]);
+        const countryRaw = args.country;
+        if (countryRaw !== undefined && countryRaw !== "") {
+            const countryNorm = countryRaw.toLowerCase();
+            if (!SUPPORTED_COUNTRIES.has(countryNorm)) {
+                throw new McpError(ErrorCode.InvalidParams, `Unsupported country code: "${countryRaw}". Supported codes are: sg, us, vn, th, my, id.`);
+            }
+        }
+        const country = countryRaw ? countryRaw.toLowerCase() : undefined;
         const params = {
             q: query,
             limit,
             availability: "in_stock",
             sort: "relevance",
         };
+        if (country)
+            params.country_code = country;
         if (args.category)
             params.category = args.category;
         const data = (await apiFetch("/v1/products/search", params));
@@ -352,6 +384,54 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     lines.push(`  • ${d}`);
                 }
             }
+        }
+        return {
+            content: [{ type: "text", text: lines.join("\n") }],
+        };
+    }
+    // ── price_history ───────────────────────────────────────────────────────────
+    if (name === "price_history") {
+        const productId = args.product_id;
+        if (!productId) {
+            throw new McpError(ErrorCode.InvalidParams, "product_id is required");
+        }
+        const days = Math.max(1, Math.min(365, Number(args.days ?? 90)));
+        const data = (await apiFetch(`/v1/products/${encodeURIComponent(productId)}/price_history`, { days }));
+        const history = data.history ?? [];
+        const current = data.current_price;
+        const stats = data.stats;
+        if (history.length === 0) {
+            return {
+                content: [{ type: "text", text: `No price history available for product: ${productId}` }],
+            };
+        }
+        const lines = [
+            `**Price history for: ${data.product_title ?? productId}**`,
+            `Data period: ${days} days`,
+            `Data points: ${history.length}`,
+            "",
+        ];
+        if (stats) {
+            lines.push("**Price statistics:**");
+            lines.push(`  Current: ${current?.currency ?? "SGD"} ${current?.amount ?? "N/A"}`, `  Lowest: ${stats.min_price_currency ?? "SGD"} ${stats.min_price ?? "N/A"} (on ${stats.min_price_date ?? "N/A"})`, `  Highest: ${stats.max_price_currency ?? "SGD"} ${stats.max_price ?? "N/A"} (on ${stats.max_price_date ?? "N/A"})`, `  Average: ${stats.avg_price_currency ?? "SGD"} ${stats.avg_price ?? "N/A"}`);
+            const discount = stats.discount_from_peak;
+            if (discount !== undefined && discount > 0) {
+                lines.push(`  **💰 Current price is ${discount.toFixed(1)}% below all-time high!**`);
+            }
+            else if (discount === 0) {
+                lines.push(`  ⚠️ Current price is at all-time high`);
+            }
+            lines.push("");
+        }
+        lines.push("**Price timeline:**");
+        for (const point of history.slice(-20).reverse()) {
+            const date = point.recorded_at ?? point.date ?? "Unknown";
+            const price = point.price ?? point.amount ?? "N/A";
+            const currency = point.currency ?? "SGD";
+            lines.push(`  ${date} — ${currency} ${price}`);
+        }
+        if (history.length > 20) {
+            lines.push(`  ... and ${history.length - 20} earlier data points`);
         }
         return {
             content: [{ type: "text", text: lines.join("\n") }],

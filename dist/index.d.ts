@@ -11,6 +11,7 @@
  *   get_product       — fetch a single product by ID
  *   get_price         — compare prices for a product across all merchants
  *   compare_prices    — side-by-side comparison of 2–5 products
+ *   price_history     — retrieve historical price trends for a product
  *   get_affiliate_link — get the click-tracked affiliate URL for a product
  *   get_catalog       — list available product categories
  *
