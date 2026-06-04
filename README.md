@@ -1,6 +1,19 @@
 # BuyWhere MCP Server — Product Search & Price Comparison for AI Agents
 
-> **AI agents use BuyWhere to search, compare prices, and discover deals across 11M+ products in Singapore, Southeast Asia, and US markets — in real time.**
+> **AI agents use BuyWhere to search products, compare prices, and discover deals across Singapore and US merchants in real time.**
+
+## Install in 30 Seconds
+
+```bash
+export BUYWHERE_API_KEY=bw_live_xxxx
+npx -y @buywhere/mcp-server
+```
+
+Use with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, Codex, Continue.dev**, and any MCP-compatible client.
+
+- npm: https://www.npmjs.com/package/@buywhere/mcp-server
+- GitHub: https://github.com/BuyWhere/buywhere-mcp
+- MCP Registry: https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp
 
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
@@ -9,8 +22,9 @@
 [![Node version](https://img.shields.io/badge/node-%3E%3D18-green)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
 [![GitHub stars](https://img.shields.io/github/stars/BuyWhere/buywhere-mcp?style=social)](https://github.com/BuyWhere/buywhere-mcp)
-[![Smithery](https://smithery.ai/badge/@BuyWhere/buywhere-mcp)](https://smithery.ai/server/@BuyWhere/buywhere-mcp)
-[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-published-blue)](https://github.com/modelcontextprotocol/registry)
+[![Smithery](https://smithery.ai/badge/@BuyWhere/buywhere-mcp)](https://smithery.ai/servers/@buywhere/mcp-server)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-published-blue)](https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp)
+[![Hashnode Blog](https://img.shields.io/badge/Hashnode-Blog-2962FF?logo=hashnode&logoColor=white)](https://buywhere.hashnode.dev/)
 
 ---
 
@@ -34,7 +48,9 @@ Join the "Build With BuyWhere" AI Agent Developer Challenge! Use the BuyWhere MC
 
 ---
 
-Product search API for AI agents via [Model Context Protocol](https://modelcontextprotocol.io). Search & compare 11M+ products — built for AI agent commerce, not store management.
+Product search API for AI agents via [Model Context Protocol](https://modelcontextprotocol.io). Built for AI agent commerce, not store management.
+
+Official MCP Registry listing: [io.github.BuyWhere/buywhere-mcp](https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp)
 
 Works with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, Codex, Continue.dev**, and any MCP-compatible client. Also supports [Agent-to-Agent (A2A)](https://github.com/google/A2A) protocol.
 
@@ -55,11 +71,6 @@ Agent:  [calls compare_prices → side-by-side with best-value pick]
 ```
 
 ## Quick Start
-
-```bash
-export BUYWHERE_API_KEY=bw_live_xxxx
-npx -y @buywhere/mcp-server
-```
 
 Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 
@@ -92,6 +103,11 @@ Also follow the **[BuyWhere Hashnode blog mirror](https://buywhere.hashnode.dev/
 | `get_catalog` | Available product category taxonomy |
 
 ## MCP Client Configuration
+
+Framework quickstarts:
+
+- CrewAI: [API key](https://buywhere.ai/api-keys) · [BuyWhere quickstart](https://github.com/BuyWhere/buywhere-mcp#quick-start)
+- Mastra: [API key](https://buywhere.ai/api-keys) · [BuyWhere quickstart](https://github.com/BuyWhere/buywhere-mcp#quick-start)
 
 ### Claude Desktop
 
@@ -175,6 +191,63 @@ Add to `~/.continue/config.json`:
 }
 ```
 
+### CrewAI
+
+Use BuyWhere as a local MCP server inside CrewAI's `mcps` field:
+
+```python
+from crewai import Agent
+from crewai.mcp import MCPServerStdio
+
+shopping_agent = Agent(
+    role="Shopping Researcher",
+    goal="Search products and compare prices across markets",
+    backstory="A commerce agent with direct access to BuyWhere MCP.",
+    mcps=[
+        MCPServerStdio(
+            command="npx",
+            args=["-y", "@buywhere/mcp-server"],
+            env={"BUYWHERE_API_KEY": "bw_live_xxxx"},
+        )
+    ],
+)
+```
+
+Create a key: [buywhere.ai/api-keys](https://buywhere.ai/api-keys)  
+Quickstart: [github.com/BuyWhere/buywhere-mcp#quick-start](https://github.com/BuyWhere/buywhere-mcp#quick-start)
+
+### Mastra
+
+Load BuyWhere tools into a Mastra agent through `@mastra/mcp`:
+
+```ts
+import { Agent } from "@mastra/core/agent";
+import { MCPClient } from "@mastra/mcp";
+import { openai } from "@ai-sdk/openai";
+
+const mcp = new MCPClient({
+  servers: {
+    buywhere: {
+      command: "npx",
+      args: ["-y", "@buywhere/mcp-server"],
+      env: { BUYWHERE_API_KEY: "bw_live_xxxx" },
+    },
+  },
+});
+
+const tools = await mcp.getTools();
+
+export const shoppingAgent = new Agent({
+  name: "shopping-agent",
+  instructions: "Use BuyWhere tools to search products and compare prices.",
+  model: openai("gpt-4o-mini"),
+  tools,
+});
+```
+
+Create a key: [buywhere.ai/api-keys](https://buywhere.ai/api-keys)  
+Quickstart: [github.com/BuyWhere/buywhere-mcp#quick-start](https://github.com/BuyWhere/buywhere-mcp#quick-start)
+
 ## Configuration
 
 | Variable | Default | Description |
@@ -218,7 +291,7 @@ Developer's AI Agent (Claude, Cursor, etc.)
   │     └── get_catalog()
   │
   └── BuyWhere API (api.buywhere.ai)
-        └── 11M+ products across SG, SEA, US
+        └── Product catalog across SG and US merchants
 ```
 
 ## Development
@@ -233,7 +306,7 @@ npm start
 
 ## Why BuyWhere?
 
-BuyWhere is a product search API for AI agents. We aggregate 11M+ products from Singapore, Southeast Asia, and US markets into a single, agent-friendly interface — no store management, no Shopify integration. Just search and compare products in real time.
+BuyWhere is a product search API for AI agents. We aggregate product data from Singapore and US merchants into a single, agent-friendly interface — no store management, no Shopify integration. Just search and compare products in real time.
 
 - **One API** — all markets, all retailers
 - **Agent-native** — built for MCP from day one

@@ -20,7 +20,7 @@ mcp:
   authentication:
     type: bearer
     description: >
-      API key required. Get a free key at https://buywhere.ai/dashboard.
+      API key required. Get a free key at https://buywhere.ai/api-keys.
       Free tier: 1,000 calls/month. No credit card required.
 
 tools:
@@ -91,7 +91,7 @@ startCommand:
       apiKey:
         type: string
         title: BuyWhere API Key
-        description: Your BuyWhere API key. Get one free at https://buywhere.ai/dashboard
+        description: Your BuyWhere API key. Get one free at https://buywhere.ai/api-keys
         x-sensitive: true
     required: [apiKey]
   commandFunction: |-
@@ -108,6 +108,7 @@ supported_clients:
   - Custom MCP agents
   - LangChain
   - CrewAI
+  - Mastra
   - AutoGen
   - Gemini
 
@@ -119,7 +120,7 @@ regions:
   - Malaysia (MY)
 
 features:
-  - Real-time product search across 1.5M+ products
+  - Real-time product search across Singapore and US merchants
   - Cross-merchant price comparison
   - Discount/deal discovery
   - Category browsing
