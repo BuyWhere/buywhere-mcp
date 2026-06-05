@@ -173,6 +173,44 @@ Add to `~/.continue/config.json`:
 }
 ```
 
+### Mastra
+
+[Mastra](https://mastra.ai) is a TypeScript-first AI agent framework with native MCP support.
+
+```bash
+npm install @mastra/core @mastra/mcp
+```
+
+```typescript
+import { Mastra } from '@mastra/core';
+import { MastraMCPClient } from '@mastra/mcp';
+
+const buywhere = new MastraMCPClient({
+  name: 'buywhere',
+  server: {
+    url: new URL('https://api.buywhere.ai/mcp'),
+    requestInit: {
+      headers: { 'Authorization': `Bearer ${process.env.BUYWHERE_API_KEY}` },
+    },
+  },
+});
+
+const agent = new Mastra({
+  agents: {
+    shoppingAgent: {
+      instructions: 'You are a shopping assistant. Use BuyWhere to find and compare products.',
+      tools: await buywhere.tools(),
+    },
+  },
+});
+
+const result = await agent.agents.shoppingAgent.generate(
+  'Find me the best deal on a Sony WH-1000XM5 in Singapore'
+);
+```
+
+Full guide: [BuyWhere + Mastra Integration](https://api.buywhere.ai/docs/guides/mastra-integration)
+
 ## Configuration
 
 | Variable | Default | Description |
