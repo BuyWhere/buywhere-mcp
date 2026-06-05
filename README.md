@@ -211,6 +211,47 @@ const result = await agent.agents.shoppingAgent.generate(
 
 Full guide: [BuyWhere + Mastra Integration](https://api.buywhere.ai/docs/guides/mastra-integration)
 
+### LangChain
+
+Use BuyWhere tools in LangChain agents via the MCP adapter:
+
+```python
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+from langchain_anthropic import ChatAnthropic
+
+async def main():
+    async with MultiServerMCPClient({
+        "buywhere": {
+            "url": "https://api.buywhere.ai/mcp",
+            "transport": "streamable_http",
+            "headers": {"Authorization": f"Bearer {BUYWHERE_API_KEY}"},
+        }
+    }) as client:
+        tools = await client.get_tools()
+        agent = create_react_agent(ChatAnthropic(model="claude-sonnet-4-5"), tools)
+        result = await agent.ainvoke({"messages": [("user", "Find the cheapest Sony headphones in Singapore")]})
+```
+
+### LlamaIndex
+
+Connect BuyWhere via LlamaIndex MCP client:
+
+```python
+from llama_index.tools.mcp import BasicMCPClient, McpToolSpec
+from llama_index.agent.openai import OpenAIAgent
+
+async def main():
+    mcp_client = BasicMCPClient(
+        command_or_url="https://api.buywhere.ai/mcp",
+        headers={"Authorization": f"Bearer {BUYWHERE_API_KEY}"},
+    )
+    mcp_tool_spec = McpToolSpec(client=mcp_client)
+    tools = mcp_tool_spec.to_tool_list()
+    agent = OpenAIAgent.from_tools(tools)
+    response = await agent.achat("Compare prices for iPhone 16 Pro across Singapore and US")
+```
+
 ## Configuration
 
 | Variable | Default | Description |
