@@ -252,6 +252,38 @@ async def main():
     response = await agent.achat("Compare prices for iPhone 16 Pro across Singapore and US")
 ```
 
+### CrewAI
+
+Use BuyWhere in a CrewAI agent with MCP tool integration:
+
+```python
+from crewai import Agent, Task, Crew
+from crewai_tools import MCPServerAdapter
+
+buywhere_server = MCPServerAdapter(
+    server_params={
+        "url": "https://api.buywhere.ai/mcp",
+        "headers": {"Authorization": f"Bearer {BUYWHERE_API_KEY}"},
+        "transport": "streamable-http",
+    }
+)
+
+shopping_agent = Agent(
+    role="Shopping Research Analyst",
+    goal="Find the best deals across Singapore and US markets",
+    tools=[buywhere_server],
+)
+
+task = Task(
+    description="Find the best price for Sony WH-1000XM5 headphones across all available markets",
+    agent=shopping_agent,
+    expected_output="Product comparison with prices and merchant links",
+)
+
+crew = Crew(agents=[shopping_agent], tasks=[task])
+result = crew.kickoff()
+```
+
 ## Configuration
 
 | Variable | Default | Description |
