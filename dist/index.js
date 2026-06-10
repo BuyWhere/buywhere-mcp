@@ -31,6 +31,8 @@ import { CallToolRequestSchema, ErrorCode, ListResourcesRequestSchema, ListTools
 // ---------------------------------------------------------------------------
 const API_KEY = process.env.BUYWHERE_API_KEY;
 const BASE_URL = (process.env.BUYWHERE_API_URL ?? "https://api.buywhere.ai").replace(/\/$/, "");
+const API_TIMEOUT_MS = Number(process.env.BUYWHERE_API_TIMEOUT_MS ?? 12000);
+const SUPPORTED_COUNTRIES = new Set(["sg", "us", "vn", "th", "my", "id"]);
 if (!API_KEY) {
     process.stderr.write("Warning: BUYWHERE_API_KEY not set — tool calls will return an auth error.\n" +
         "Get your key at https://buywhere.ai/dashboard\n");
@@ -47,13 +49,24 @@ async function apiFetch(path, params) {
             }
         }
     }
-    const res = await fetch(url.toString(), {
-        headers: {
-            "X-API-Key": API_KEY,
-            Accept: "application/json",
-            "User-Agent": "buywhere-mcp/0.1.0",
-        },
-    });
+    let res;
+    try {
+        res = await fetch(url.toString(), {
+            headers: {
+                "X-API-Key": API_KEY,
+                Accept: "application/json",
+                "User-Agent": "buywhere-mcp/0.1.0",
+            },
+            signal: AbortSignal.timeout(API_TIMEOUT_MS),
+        });
+    }
+    catch (error) {
+        if (error instanceof Error &&
+            (error.name === "TimeoutError" || error.name === "AbortError")) {
+            throw new McpError(ErrorCode.InternalError, `BuyWhere API request timed out after ${API_TIMEOUT_MS}ms for ${path}`);
+        }
+        throw error;
+    }
     if (!res.ok) {
         const text = await res.text().catch(() => "");
         throw new McpError(ErrorCode.InternalError, `BuyWhere API error ${res.status}: ${text.slice(0, 200)}`);
@@ -61,16 +74,27 @@ async function apiFetch(path, params) {
     return res.json();
 }
 async function apiPost(path, body) {
-    const res = await fetch(`${BASE_URL}${path}`, {
-        method: "POST",
-        headers: {
-            "X-API-Key": API_KEY,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "User-Agent": "buywhere-mcp/0.1.0",
-        },
-        body: JSON.stringify(body),
-    });
+    let res;
+    try {
+        res = await fetch(`${BASE_URL}${path}`, {
+            method: "POST",
+            headers: {
+                "X-API-Key": API_KEY,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                "User-Agent": "buywhere-mcp/0.1.0",
+            },
+            body: JSON.stringify(body),
+            signal: AbortSignal.timeout(API_TIMEOUT_MS),
+        });
+    }
+    catch (error) {
+        if (error instanceof Error &&
+            (error.name === "TimeoutError" || error.name === "AbortError")) {
+            throw new McpError(ErrorCode.InternalError, `BuyWhere API request timed out after ${API_TIMEOUT_MS}ms for ${path}`);
+        }
+        throw error;
+    }
     if (!res.ok) {
         const text = await res.text().catch(() => "");
         throw new McpError(ErrorCode.InternalError, `BuyWhere API error ${res.status}: ${text.slice(0, 200)}`);
@@ -126,6 +150,19 @@ function formatListing(lst) {
         parts.push(`  Rating: ${merchant.rating}`);
     return parts.join("\n");
 }
+function normalizeCountryCode(raw, fieldName = "country_code") {
+    if (raw === undefined || raw === null || raw === "") {
+        return undefined;
+    }
+    if (typeof raw !== "string") {
+        throw new McpError(ErrorCode.InvalidParams, `${fieldName} must be a string`);
+    }
+    const countryCode = raw.toLowerCase();
+    if (!SUPPORTED_COUNTRIES.has(countryCode)) {
+        throw new McpError(ErrorCode.InvalidParams, `Unsupported country code: "${raw}". Supported codes are: sg, us, vn, th, my, id.`);
+    }
+    return countryCode;
+}
 // ---------------------------------------------------------------------------
 // MCP server
 // ---------------------------------------------------------------------------
@@ -157,7 +194,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                     },
                     category: {
                         type: "string",
-                        description: "Category slug filter (e.g. 'electronics/smartphones', 'fashion/dresses')",
+                        description: "Category slug filter (e.g. 'mobiles-tablets', 'fashion/dresses'). " +
+                            "Aliases accepted: 'smartphone', 'smartphones', 'mobile', 'mobiles', " +
+                            "'cellphone', 'cellphones', 'phone', 'phones' all map to 'mobiles-tablets'.",
                     },
                     limit: {
                         type: "integer",
@@ -263,6 +302,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                         type: "string",
                         description: "Parent category slug to list subcategories (optional — omit for top-level categories)",
                     },
+                    country_code: {
+                        type: "string",
+                        description: "Country code to scope categories by region. Supported: sg, us, vn, th, my, id.",
+                    },
+                },
+            },
+        },
+        {
+            name: "list_categories",
+            description: "Legacy alias for get_catalog. List available product categories in the BuyWhere catalog, " +
+                "optionally scoped to a country_code.",
+            inputSchema: {
+                type: "object",
+                properties: {
+                    parent_slug: {
+                        type: "string",
+                        description: "Parent category slug to list subcategories (optional — omit for top-level categories)",
+                    },
+                    country_code: {
+                        type: "string",
+                        description: "Country code to scope categories by region. Supported: sg, us, vn, th, my, id.",
+                    },
                 },
             },
         },
@@ -280,15 +341,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             throw new McpError(ErrorCode.InvalidParams, "query is required");
         }
         const limit = Math.min(Math.max(1, Number(args.limit ?? 10)), 50);
-        const SUPPORTED_COUNTRIES = new Set(["sg", "us", "vn", "th", "my", "id"]);
-        const countryRaw = args.country;
-        if (countryRaw !== undefined && countryRaw !== "") {
-            const countryNorm = countryRaw.toLowerCase();
-            if (!SUPPORTED_COUNTRIES.has(countryNorm)) {
-                throw new McpError(ErrorCode.InvalidParams, `Unsupported country code: "${countryRaw}". Supported codes are: sg, us, vn, th, my, id.`);
-            }
-        }
-        const country = countryRaw ? countryRaw.toLowerCase() : undefined;
+        const country = normalizeCountryCode(args.country, "country");
         const params = {
             q: query,
             limit,
@@ -297,8 +350,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
         if (country)
             params.country_code = country;
-        if (args.category)
-            params.category = args.category;
+        if (args.category) {
+            const CATEGORY_ALIASES = {
+                smartphone: "mobiles-tablets",
+                smartphones: "mobiles-tablets",
+                mobile: "mobiles-tablets",
+                mobiles: "mobiles-tablets",
+                cellphone: "mobiles-tablets",
+                cellphones: "mobiles-tablets",
+                phone: "mobiles-tablets",
+                phones: "mobiles-tablets",
+            };
+            const rawCategory = args.category.toLowerCase().trim();
+            params.category = CATEGORY_ALIASES[rawCategory] ?? rawCategory;
+        }
         const data = (await apiFetch("/v1/products/search", params));
         const results = data.results ?? [];
         if (results.length === 0) {
@@ -469,14 +534,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
     }
     // ── get_catalog ──────────────────────────────────────────────────────────
-    if (name === "get_catalog") {
+    if (name === "get_catalog" || name === "list_categories") {
         const parentSlug = args.parent_slug;
+        const countryCode = normalizeCountryCode(args.country_code ?? args.country, "country_code");
+        const params = countryCode ? { country_code: countryCode } : undefined;
         let data;
         if (parentSlug) {
-            data = await apiFetch(`/v1/categories/${encodeURIComponent(parentSlug)}`);
+            data = await apiFetch(`/v1/categories/${encodeURIComponent(parentSlug)}`, params);
         }
         else {
-            data = await apiFetch("/v1/categories");
+            data = await apiFetch("/v1/categories", params);
         }
         const categories = Array.isArray(data)
             ? data
@@ -540,7 +607,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
         throw new McpError(ErrorCode.InvalidRequest, `Unknown resource URI: ${uri}. Expected buywhere://catalog/{country_code}`);
     }
     const country = match[1];
-    const data = await apiFetch("/v1/categories");
+    const data = await apiFetch("/v1/categories", { country_code: country });
     return {
         contents: [
             {
