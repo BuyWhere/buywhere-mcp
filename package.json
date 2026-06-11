@@ -1,8 +1,8 @@
 {
-  "name": "buywhere-mcp",
-  "version": "1.0.2",
+  "name": "@buywhere/mcp-server",
+  "version": "1.0.3",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
-  "description": "Product search API for AI agents via Model Context Protocol. Search & compare 11M+ products across Singapore, SEA, and US markets. Multi-currency pricing, inventory, and deal discovery — built for AI agent commerce, not store management. - Win the \"Build With BuyWhere\" Challenge: <a href=\"https://buywhere.ai/challenge\">buywhere.ai/challenge</a>",
+  "description": "Product search API for AI agents via Model Context Protocol. Search and compare products across Singapore and US merchants with real-time pricing, inventory, and deal discovery for AI agent commerce. Official MCP Registry: https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp",
   "keywords": [
     "buywhere",
     "mcp",
@@ -54,7 +54,7 @@
     "mcp-tools",
     "typescript"
   ],
-  "homepage": "https://buywhere.ai",
+  "homepage": "https://buywhere.hashnode.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/BuyWhere/buywhere-mcp"
@@ -66,12 +66,17 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "server-card.json"
   ],
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
+    "global-chat:register": "node scripts/register-global-chat.mjs",
+    "content:sync-hashnode": "node scripts/sync-devto-to-hashnode.mjs",
+    "metrics:collect": "node scripts/collect-mcp-metrics.mjs",
+    "verify:registries": "node scripts/verify-mcp-registry-listings.mjs",
     "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
     "dev": "tsc --watch"
