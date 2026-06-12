@@ -64,7 +64,7 @@ async function apiFetch(path: string, params?: Record<string, string | number | 
 
   const res = await fetch(url.toString(), {
     headers: {
-      "X-API-Key": API_KEY!,
+      Authorization: `Bearer ${API_KEY!}`,
       Accept: "application/json",
       "User-Agent": "buywhere-mcp/0.1.0",
     },
@@ -85,7 +85,7 @@ async function apiPost(path: string, body: unknown): Promise<unknown> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
     headers: {
-      "X-API-Key": API_KEY!,
+      Authorization: `Bearer ${API_KEY!}`,
       "Content-Type": "application/json",
       Accept: "application/json",
       "User-Agent": "buywhere-mcp/0.1.0",

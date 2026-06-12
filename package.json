@@ -1,6 +1,6 @@
 {
   "name": "buywhere-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
   "description": "Product search API for AI agents via Model Context Protocol. Search & compare 11M+ products across Singapore, SEA, and US markets. Multi-currency pricing, inventory, and deal discovery — built for AI agent commerce, not store management. - Win the \"Build With BuyWhere\" Challenge: <a href=\"https://buywhere.ai/challenge\">buywhere.ai/challenge</a>",
   "keywords": [
