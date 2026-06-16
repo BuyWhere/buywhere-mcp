@@ -68,7 +68,7 @@ Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 - **[Part 1: MCP for Ecommerce — The Missing Infrastructure Layer for AI Agent Shopping](https://dev.to/buywhere/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping-1i7d)** — Architecture and why agents need a product catalog API
 - **[Part 2: Build a Real Shopping Agent in 15 Minutes](https://dev.to/buywhere/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-4f5b)** — Hands-on: set up MCP server, search products, compare prices, build a working agent
 
-## Blog
+## From the Blog
 
 Read the **[BuyWhere Engineering Blog](https://buywhere.ai/blog)** for deep dives on MCP architecture, agent commerce, and the ecosystem.
 
@@ -360,7 +360,7 @@ BuyWhere is a product search API for AI agents. We aggregate 11M+ products from 
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues, submit PRs, and suggest features.
 
-## Blog
+## From the Blog
 
 Learn more about MCP servers and the BuyWhere ecosystem:
 
