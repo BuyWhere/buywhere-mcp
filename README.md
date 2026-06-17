@@ -2,6 +2,14 @@
 
 > **AI agents use BuyWhere to search, compare prices, and discover deals across 11M+ products in Singapore, Southeast Asia, and US markets — in real time.**
 
+<p align="center">
+  <a href="https://buywhere.ai/api-keys"><img src="https://img.shields.io/badge/🔑_Get_your_free_API_key-60_seconds-4f46e5?style=for-the-badge" alt="Get your free API key"></a>
+</p>
+
+<p align="center">
+  <sub>No credit card. Email + use case. Works in 60 seconds. <a href="https://buywhere.ai/api-keys">buywhere.ai/api-keys →</a></sub>
+</p>
+
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm weekly downloads](https://img.shields.io/npm/dw/@buywhere/mcp-server?label=downloads%2Fweek)](https://www.npmjs.com/package/@buywhere/mcp-server)
