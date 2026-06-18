@@ -4,7 +4,7 @@ slug: "how-i-built-a-price-comparison-mcp-server"
 subtitle: "An MCP server that finds the cheapest price across Amazon, Best Buy, Shopee, Lazada, Apple Store, and 4 more retailers — across 9 countries — in under 2 seconds. Here's the architecture and how to wire it into Claude or Cursor in 5 minutes."
 tags: "mcp, modelcontextprotocol, claude, cursor, llm, devtools, api, comparison, ecommerce, indie-hacker"
 domain: "buywhere.hashnode.dev"
-canonical: "https://buywhere.ai/blog/how-i-built-a-price-comparison-mcp-server"
+canonical: "https://buywhere.ai/quickstart"
 enableToc: true
 ---
 
