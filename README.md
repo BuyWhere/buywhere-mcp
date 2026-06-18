@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <sub>No credit card. Email + use case. Works in 60 seconds. <a href="https://buywhere.ai/api-keys">buywhere.ai/api-keys →</a></sub>
+  <sub>Or get one in <b>3 seconds, no signup, no email</b>: <code>POST /v1/auth/register</code> · Legacy form: <a href="https://buywhere.ai/api-keys">buywhere.ai/api-keys</a></sub>
 </p>
 
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
@@ -64,12 +64,21 @@ Agent:  [calls compare_prices → side-by-side with best-value pick]
 
 ## Quick Start
 
+**Get a key in 3 seconds — no signup, no email:**
+
 ```bash
-export BUYWHERE_API_KEY=bw_live_xxxx
+# 1. Register (one call, returns api_key instantly)
+curl -X POST https://api.buywhere.ai/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"agent_name":"your-agent"}'
+# → {"api_key":"bw_...","tier":"unverified","rate_limit":{"rpm":20,"daily":1000}}
+
+# 2. Use the key
+export BUYWHERE_API_KEY=bw_...
 npx -y @buywhere/mcp-server
 ```
 
-Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
+Legacy email signup (60s, manual approval) → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 
 ## Tutorials
 
@@ -296,7 +305,7 @@ result = crew.kickoff()
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `BUYWHERE_API_KEY` | (required) | API key from [buywhere.ai/api-keys](https://buywhere.ai/api-keys) |
+| `BUYWHERE_API_KEY` | (required) | API key (no signup: `POST /v1/auth/register {"agent_name":"<name>"}`) — returns instantly, no email verification |
 | `BUYWHERE_API_URL` | `https://api.buywhere.ai/mcp` | Custom API base URL |
 
 ## Install
