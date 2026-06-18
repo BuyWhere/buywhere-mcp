@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.BuyWhere/buywhere-mcp",
-  "title": "BuyWhere — AI Product Search API",
-  "description": "Product search API for AI agents via MCP. Search 11M+ products across 3,700+ retailers in SG, US, MY, VN, TH. Real-time pricing, price comparison, and deal discovery. Built for AI agent commerce, not store management.",
+  "title": "BuyWhere \u2014 AI Product Search API",
+  "description": "Product search API for AI agents via MCP. Get a free key in 3 seconds with no signup: POST https://api.buywhere.ai/v1/auth/register. Search 11M+ products across 3,700+ retailers in SG, US, MY, VN, TH. Real-time pricing, price comparison, and deal discovery. Built for AI agent commerce, not store management.",
   "website": "https://buywhere.ai",
   "blog": "https://buywhere.ai/blog",
   "repository": {
@@ -21,7 +21,7 @@
       "environmentVariables": [
         {
           "name": "BUYWHERE_API_KEY",
-          "description": "BuyWhere API key for authenticated product catalog requests.",
+          "description": "BuyWhere API key (no signup required \u2014 get one at POST https://api.buywhere.ai/v1/auth/register with {\"agent_name\":\"<name>\"}).",
           "isRequired": true,
           "isSecret": true,
           "format": "string"
