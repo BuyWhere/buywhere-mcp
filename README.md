@@ -366,6 +366,16 @@ BuyWhere is a product search API for AI agents. We aggregate 11M+ products from 
 - **Real-time** — live pricing and availability
 - **Developer-first** — no SDK needed, just add the server
 
+## Works Well With
+
+These complementary MCP packages extend BuyWhere into powerful multi-tool workflows:
+
+- **[@modelcontextprotocol/server-filesystem](https://www.npmjs.com/package/@modelcontextprotocol/server-filesystem)** — Save shopping results and product research to your local filesystem. Combine with BuyWhere to export deal lists, price comparisons, and product specs as structured files.
+- **[@supabase/mcp-server-supabase](https://www.npmjs.com/package/@supabase/mcp-server-supabase)** — Store favorite products, user preferences, and price alerts in Supabase. Persist shopping history across agent sessions.
+- **[n8n-mcp](https://www.npmjs.com/package/n8n-mcp)** — Automate price monitoring workflows. Build no-code pipelines that watch BuyWhere prices and trigger notifications on price drops.
+- **[tavily-mcp](https://www.npmjs.com/package/tavily-mcp)** — Research products before buying. Use Tavily to find reviews and comparisons, then use BuyWhere to get current prices and purchase links.
+- **[@playwright/mcp](https://www.npmjs.com/package/@playwright/mcp)** — E2E test your shopping agent interactions. Verify that product search, price comparison, and checkout flows work correctly in browser automation.
+
 ## Protocols
 
 | Protocol | Support |
