@@ -45,7 +45,7 @@ if (!API_KEY) {
 // ---------------------------------------------------------------------------
 function buildApiHeaders(toolName, method, includeJsonContentType = false) {
     const headers = {
-        "X-API-Key": API_KEY,
+        Authorization: `Bearer ${API_KEY}`,
         Accept: "application/json",
         "User-Agent": USER_AGENT,
         "X-Agent-Framework": "custom",

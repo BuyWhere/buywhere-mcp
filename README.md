@@ -15,6 +15,14 @@ Use with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, C
 - GitHub: https://github.com/BuyWhere/buywhere-mcp
 - MCP Registry: https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp
 
+<p align="center">
+  <a href="https://buywhere.ai/api-keys"><img src="https://img.shields.io/badge/🔑_Get_your_free_API_key-60_seconds-4f46e5?style=for-the-badge" alt="Get your free API key"></a>
+</p>
+
+<p align="center">
+  <sub>Or get one in <b>3 seconds, no signup, no email</b>: <code>POST /v1/auth/register</code> · Legacy form: <a href="https://buywhere.ai/api-keys">buywhere.ai/api-keys</a></sub>
+</p>
+
 [![npm version](https://img.shields.io/npm/v/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@buywhere/mcp-server.svg)](https://www.npmjs.com/package/@buywhere/mcp-server)
 [![npm weekly downloads](https://img.shields.io/npm/dw/@buywhere/mcp-server?label=downloads%2Fweek)](https://www.npmjs.com/package/@buywhere/mcp-server)
@@ -72,14 +80,28 @@ Agent:  [calls compare_prices → side-by-side with best-value pick]
 
 ## Quick Start
 
-Get your free API key → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
+**Get a key in 3 seconds — no signup, no email:**
+
+```bash
+# 1. Register (one call, returns api_key instantly)
+curl -X POST https://api.buywhere.ai/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"agent_name":"your-agent"}'
+# → {"api_key":"bw_...","tier":"unverified","rate_limit":{"rpm":20,"daily":1000}}
+
+# 2. Use the key
+export BUYWHERE_API_KEY=bw_...
+npx -y @buywhere/mcp-server
+```
+
+Legacy email signup (60s, manual approval) → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
 
 ## Tutorials
 
 - **[Part 1: MCP for Ecommerce — The Missing Infrastructure Layer for AI Agent Shopping](https://dev.to/buywhere/mcp-for-ecommerce-the-missing-infrastructure-layer-for-ai-agent-shopping-1i7d)** — Architecture and why agents need a product catalog API
 - **[Part 2: Build a Real Shopping Agent in 15 Minutes](https://dev.to/buywhere/mcp-for-ecommerce-part-2-build-a-real-shopping-agent-in-15-minutes-4f5b)** — Hands-on: set up MCP server, search products, compare prices, build a working agent
 
-## Blog
+## From the Blog
 
 Read the **[BuyWhere Engineering Blog](https://buywhere.ai/blog)** for deep dives on MCP architecture, agent commerce, and the ecosystem.
 
@@ -191,68 +213,122 @@ Add to `~/.continue/config.json`:
 }
 ```
 
-### CrewAI
-
-Use BuyWhere as a local MCP server inside CrewAI's `mcps` field:
-
-```python
-from crewai import Agent
-from crewai.mcp import MCPServerStdio
-
-shopping_agent = Agent(
-    role="Shopping Researcher",
-    goal="Search products and compare prices across markets",
-    backstory="A commerce agent with direct access to BuyWhere MCP.",
-    mcps=[
-        MCPServerStdio(
-            command="npx",
-            args=["-y", "@buywhere/mcp-server"],
-            env={"BUYWHERE_API_KEY": "bw_live_xxxx"},
-        )
-    ],
-)
-```
-
-Create a key: [buywhere.ai/api-keys](https://buywhere.ai/api-keys)  
-Quickstart: [github.com/BuyWhere/buywhere-mcp#quick-start](https://github.com/BuyWhere/buywhere-mcp#quick-start)
-
 ### Mastra
 
-Load BuyWhere tools into a Mastra agent through `@mastra/mcp`:
+[Mastra](https://mastra.ai) is a TypeScript-first AI agent framework with native MCP support.
 
-```ts
-import { Agent } from "@mastra/core/agent";
-import { MCPClient } from "@mastra/mcp";
-import { openai } from "@ai-sdk/openai";
+```bash
+npm install @mastra/core @mastra/mcp
+```
 
-const mcp = new MCPClient({
-  servers: {
-    buywhere: {
-      command: "npx",
-      args: ["-y", "@buywhere/mcp-server"],
-      env: { BUYWHERE_API_KEY: "bw_live_xxxx" },
+```typescript
+import { Mastra } from '@mastra/core';
+import { MastraMCPClient } from '@mastra/mcp';
+
+const buywhere = new MastraMCPClient({
+  name: 'buywhere',
+  server: {
+    url: new URL('https://api.buywhere.ai/mcp'),
+    requestInit: {
+      headers: { 'Authorization': `Bearer ${process.env.BUYWHERE_API_KEY}` },
     },
   },
 });
 
-const tools = await mcp.getTools();
-
-export const shoppingAgent = new Agent({
-  name: "shopping-agent",
-  instructions: "Use BuyWhere tools to search products and compare prices.",
-  model: openai("gpt-4o-mini"),
-  tools,
+const agent = new Mastra({
+  agents: {
+    shoppingAgent: {
+      instructions: 'You are a shopping assistant. Use BuyWhere to find and compare products.',
+      tools: await buywhere.tools(),
+    },
+  },
 });
+
+const result = await agent.agents.shoppingAgent.generate(
+  'Find me the best deal on a Sony WH-1000XM5 in Singapore'
+);
 ```
 
-Create a key: [buywhere.ai/api-keys](https://buywhere.ai/api-keys)  
-Quickstart: [github.com/BuyWhere/buywhere-mcp#quick-start](https://github.com/BuyWhere/buywhere-mcp#quick-start)
+Full guide: [BuyWhere + Mastra Integration](https://api.buywhere.ai/docs/guides/mastra-integration)
+
+### LangChain
+
+Use BuyWhere tools in LangChain agents via the MCP adapter:
+
+```python
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langgraph.prebuilt import create_react_agent
+from langchain_anthropic import ChatAnthropic
+
+async def main():
+    async with MultiServerMCPClient({
+        "buywhere": {
+            "url": "https://api.buywhere.ai/mcp",
+            "transport": "streamable_http",
+            "headers": {"Authorization": f"Bearer {BUYWHERE_API_KEY}"},
+        }
+    }) as client:
+        tools = await client.get_tools()
+        agent = create_react_agent(ChatAnthropic(model="claude-sonnet-4-5"), tools)
+        result = await agent.ainvoke({"messages": [("user", "Find the cheapest Sony headphones in Singapore")]})
+```
+
+### LlamaIndex
+
+Connect BuyWhere via LlamaIndex MCP client:
+
+```python
+from llama_index.tools.mcp import BasicMCPClient, McpToolSpec
+from llama_index.agent.openai import OpenAIAgent
+
+async def main():
+    mcp_client = BasicMCPClient(
+        command_or_url="https://api.buywhere.ai/mcp",
+        headers={"Authorization": f"Bearer {BUYWHERE_API_KEY}"},
+    )
+    mcp_tool_spec = McpToolSpec(client=mcp_client)
+    tools = mcp_tool_spec.to_tool_list()
+    agent = OpenAIAgent.from_tools(tools)
+    response = await agent.achat("Compare prices for iPhone 16 Pro across Singapore and US")
+```
+
+### CrewAI
+
+Use BuyWhere in a CrewAI agent with MCP tool integration:
+
+```python
+from crewai import Agent, Task, Crew
+from crewai_tools import MCPServerAdapter
+
+buywhere_server = MCPServerAdapter(
+    server_params={
+        "url": "https://api.buywhere.ai/mcp",
+        "headers": {"Authorization": f"Bearer {BUYWHERE_API_KEY}"},
+        "transport": "streamable-http",
+    }
+)
+
+shopping_agent = Agent(
+    role="Shopping Research Analyst",
+    goal="Find the best deals across Singapore and US markets",
+    tools=[buywhere_server],
+)
+
+task = Task(
+    description="Find the best price for Sony WH-1000XM5 headphones across all available markets",
+    agent=shopping_agent,
+    expected_output="Product comparison with prices and merchant links",
+)
+
+crew = Crew(agents=[shopping_agent], tasks=[task])
+result = crew.kickoff()
+```
 
 ## Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `BUYWHERE_API_KEY` | (required) | API key from [buywhere.ai/api-keys](https://buywhere.ai/api-keys) |
+| `BUYWHERE_API_KEY` | (required) | API key (no signup: `POST /v1/auth/register {"agent_name":"<name>"}`) — returns instantly, no email verification |
 | `BUYWHERE_API_URL` | `https://api.buywhere.ai/mcp` | Custom API base URL |
 
 ## Install
@@ -313,6 +389,16 @@ BuyWhere is a product search API for AI agents. We aggregate product data from S
 - **Real-time** — live pricing and availability
 - **Developer-first** — no SDK needed, just add the server
 
+## Works Well With
+
+These complementary MCP packages extend BuyWhere into powerful multi-tool workflows:
+
+- **[@modelcontextprotocol/server-filesystem](https://www.npmjs.com/package/@modelcontextprotocol/server-filesystem)** — Save shopping results and product research to your local filesystem. Combine with BuyWhere to export deal lists, price comparisons, and product specs as structured files.
+- **[@supabase/mcp-server-supabase](https://www.npmjs.com/package/@supabase/mcp-server-supabase)** — Store favorite products, user preferences, and price alerts in Supabase. Persist shopping history across agent sessions.
+- **[n8n-mcp](https://www.npmjs.com/package/n8n-mcp)** — Automate price monitoring workflows. Build no-code pipelines that watch BuyWhere prices and trigger notifications on price drops.
+- **[tavily-mcp](https://www.npmjs.com/package/tavily-mcp)** — Research products before buying. Use Tavily to find reviews and comparisons, then use BuyWhere to get current prices and purchase links.
+- **[@playwright/mcp](https://www.npmjs.com/package/@playwright/mcp)** — E2E test your shopping agent interactions. Verify that product search, price comparison, and checkout flows work correctly in browser automation.
+
 ## Protocols
 
 | Protocol | Support |
@@ -323,6 +409,17 @@ BuyWhere is a product search API for AI agents. We aggregate product data from S
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues, submit PRs, and suggest features.
+
+## From the Blog
+
+Learn more about MCP servers and the BuyWhere ecosystem:
+
+- [MCP server discovery](https://buywhere.hashnode.dev/the-mcp-server-discovery-gap) — Understanding the MCP server discovery gap
+- [Building production MCP servers](https://buywhere.hashnode.dev/building-production-mcp-servers) — Production best practices for MCP servers
+- [MCP servers that earn their context window](https://buywhere.hashnode.dev/5-mcp-servers-that-earn-context-window) — MCP servers that maximize context window value
+- [MCP ecommerce guide](https://buywhere.hashnode.dev/mcp-for-ecommerce-definitive-guide) — Definitive guide to MCP for ecommerce
+- [BuyWhere MCP launch](https://buywhere.hashnode.dev/buywhere-mcp-goes-live) — Announcing the BuyWhere MCP server launch
+- [MCP server ecosystem 2026](https://buywhere.hashnode.dev/mcp-server-ecosystem-2026-complete-guide) — Complete guide to the MCP server ecosystem in 2026
 
 ## Support
 

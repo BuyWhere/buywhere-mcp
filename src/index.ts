@@ -60,7 +60,7 @@ if (!API_KEY) {
 
 function buildApiHeaders(toolName: string, method: "GET" | "POST", includeJsonContentType = false): Record<string, string> {
   const headers: Record<string, string> = {
-    "X-API-Key": API_KEY!,
+    Authorization: `Bearer ${API_KEY!}`,
     Accept: "application/json",
     "User-Agent": USER_AGENT,
     "X-Agent-Framework": "custom",
