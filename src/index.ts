@@ -9,10 +9,11 @@
  * Tools:
  *   search_products   — keyword / natural-language product search
  *   get_product       — fetch a single product by ID
- *   get_price         — compare prices for a product across all merchants
- *   compare_prices    — side-by-side comparison of 2–5 products
- *   get_affiliate_link — get the click-tracked affiliate URL for a product
- *   get_catalog       — list available product categories
+ *   compare_products  — side-by-side comparison of 2–10 products
+ *   get_deals         — discounted products sorted by discount %
+ *   list_categories   — list available product categories
+ *   find_best_price   — find cheapest option across all merchants
+ *   ingest_products   — batch-upsert products into the catalog (API key required)
  *
  * Resources:
  *   buywhere://catalog/{country}  — list available categories for a country
@@ -40,11 +41,16 @@ import {
 
 const API_KEY = process.env.BUYWHERE_API_KEY;
 const BASE_URL = (process.env.BUYWHERE_API_URL ?? "https://api.buywhere.ai").replace(/\/$/, "");
+const MCP_SERVER_NAME = "io.github.BuyWhere/buywhere-mcp";
+const MCP_SERVER_VERSION = "1.0.3";
+const USER_AGENT = `buywhere-mcp/${MCP_SERVER_VERSION}`;
+const AGENT_CARD_URL = "https://buywhere.ai/.well-known/agent.json";
+const LLMS_TXT_URL = "https://buywhere.ai/llms.txt";
 
 if (!API_KEY) {
   process.stderr.write(
     "Warning: BUYWHERE_API_KEY not set — tool calls will return an auth error.\n" +
-      "Get your key at https://buywhere.ai/dashboard\n",
+      "Get your key at https://buywhere.ai/api-keys\n",
   );
 }
 
@@ -52,7 +58,34 @@ if (!API_KEY) {
 // HTTP helpers
 // ---------------------------------------------------------------------------
 
-async function apiFetch(path: string, params?: Record<string, string | number | undefined>): Promise<unknown> {
+function buildApiHeaders(toolName: string, method: "GET" | "POST", includeJsonContentType = false): Record<string, string> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${API_KEY!}`,
+    Accept: "application/json",
+    "User-Agent": USER_AGENT,
+    "X-Agent-Framework": "custom",
+    "X-Agent-Protocol": "mcp",
+    "X-Agent-Card": AGENT_CARD_URL,
+    "X-LLMs-Txt": LLMS_TXT_URL,
+    "X-MCP-Server-Name": MCP_SERVER_NAME,
+    "X-MCP-Server-Version": MCP_SERVER_VERSION,
+    "X-MCP-Transport": "stdio",
+    "X-MCP-Tool-Name": toolName,
+    "X-MCP-HTTP-Method": method,
+  };
+
+  if (includeJsonContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
+}
+
+async function apiFetch(
+  path: string,
+  params?: Record<string, string | number | boolean | undefined>,
+  toolName = "unknown",
+): Promise<unknown> {
   const url = new URL(`${BASE_URL}${path}`);
   if (params) {
     for (const [k, v] of Object.entries(params)) {
@@ -63,11 +96,7 @@ async function apiFetch(path: string, params?: Record<string, string | number | 
   }
 
   const res = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${API_KEY!}`,
-      Accept: "application/json",
-      "User-Agent": "buywhere-mcp/0.1.0",
-    },
+    headers: buildApiHeaders(toolName, "GET"),
   });
 
   if (!res.ok) {
@@ -81,15 +110,10 @@ async function apiFetch(path: string, params?: Record<string, string | number | 
   return res.json();
 }
 
-async function apiPost(path: string, body: unknown): Promise<unknown> {
+async function apiPost(path: string, body: unknown, toolName = "unknown"): Promise<unknown> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_KEY!}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "User-Agent": "buywhere-mcp/0.1.0",
-    },
+    headers: buildApiHeaders(toolName, "POST", true),
     body: JSON.stringify(body),
   });
 
@@ -117,12 +141,12 @@ function formatProduct(p: Record<string, unknown>): string {
   const lines: string[] = [
     `**${p.title ?? p.name}**`,
     `ID: ${p.product_id ?? p.id}`,
-    `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? "N/A"}`,
+    `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}`,
     `Category: ${p.category ?? ""}`,
     `Merchant: ${merchant?.name ?? merchant?.merchant_id ?? ""}` +
       (merchant?.platform ? ` (${merchant.platform})` : ""),
     `In stock: ${avail?.in_stock ? "Yes" : "No"}`,
-    `URL: ${p.source_url ?? ""}`,
+    `URL: ${p.source_url ?? p.url ?? ""}`,
   ];
 
   if (images.length > 0) {
@@ -139,32 +163,12 @@ function formatProduct(p: Record<string, unknown>): string {
   return lines.join("\n");
 }
 
-function formatListing(lst: Record<string, unknown>): string {
-  const price = lst.price as Record<string, unknown> | undefined;
-  const merchant = lst.merchant as Record<string, unknown> | undefined;
-  const avail = lst.availability as Record<string, unknown> | undefined;
-
-  const parts: string[] = [
-    `  Merchant: ${merchant?.name ?? merchant?.merchant_id ?? "unknown"} (${merchant?.platform ?? ""})`,
-    `  Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}` +
-      (price?.shipping_fee !== undefined && price.shipping_fee !== 0
-        ? ` + ${price.shipping_fee} shipping`
-        : " (free shipping)"),
-    `  Total: ${price?.currency ?? "SGD"} ${price?.total ?? "N/A"}`,
-    `  In stock: ${avail?.in_stock ? "Yes" : "No"}` +
-      (avail?.next_day_available ? " (next-day delivery available)" : ""),
-    `  URL: ${lst.source_url ?? ""}`,
-  ];
-  if (merchant?.rating) parts.push(`  Rating: ${merchant.rating}`);
-  return parts.join("\n");
-}
-
 // ---------------------------------------------------------------------------
 // MCP server
 // ---------------------------------------------------------------------------
 
 const server = new Server(
-  { name: "buywhere-mcp", version: "0.1.0" },
+  { name: "buywhere-mcp", version: MCP_SERVER_VERSION },
   {
     capabilities: {
       tools: {},
@@ -182,112 +186,237 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "search_products",
       description:
-        "Search the BuyWhere product catalog using keywords or natural language. " +
-        "Returns matching products with title, price, availability, merchant, and URL.",
+        "Search the BuyWhere product catalog by keyword. Returns products from e-commerce platforms across " +
+        "multiple regions (Singapore, US, etc.). Use compact=true for agent-optimized responses with " +
+        "structured_specs, comparison_attributes, and normalized_price_usd fields.",
       inputSchema: {
         type: "object",
         properties: {
-          query: {
+          q: {
             type: "string",
-            description: "Keyword or natural-language query (e.g. 'wireless earbuds under $50', 'red dress size M')",
+            description: "Keyword search query",
+          },
+          domain: {
+            type: "string",
+            description: "Filter by merchant platform (e.g. lazada, shopee, amazon)",
+          },
+          region: {
+            type: "string",
+            description: "Filter by region (sea, us, eu, au)",
+          },
+          country_code: {
+            type: "string",
+            enum: ["SG", "US", "VN", "TH", "MY"],
+            description:
+              "Filter by ISO country code. Also infers default currency for price filters (SG→SGD, US→USD, VN→VND, TH→THB, MY→MYR).",
           },
           country: {
             type: "string",
-            description: "Country code to scope results (e.g. 'sg' for Singapore). Defaults to 'sg'.",
+            description: "Alias for country_code (deprecated, use country_code)",
           },
-          category: {
-            type: "string",
-            description: "Category slug filter (e.g. 'electronics/smartphones', 'fashion/dresses')",
+          min_price: {
+            type: "number",
+            description: "Minimum price (in currency inferred from country_code, or SGD by default)",
+          },
+          max_price: {
+            type: "number",
+            description: "Maximum price (in currency inferred from country_code, or SGD by default)",
           },
           limit: {
             type: "integer",
-            description: "Maximum number of results to return (1–50, default 10)",
-            default: 10,
+            description: "Number of results (max 100, default 20)",
+            default: 20,
+          },
+          offset: {
+            type: "integer",
+            description: "Pagination offset",
+            default: 0,
+          },
+          compact: {
+            type: "boolean",
+            description:
+              "Return agent-optimized compact shape: structured_specs, comparison_attributes, normalized_price_usd. " +
+              "Reduces response size ~40%. Recommended for agent tool-use.",
+            default: false,
+          },
+          category: {
+            type: "string",
+            description:
+              'Filter by product category name (e.g. "Laptops", "Smartphones", "Televisions"). ' +
+              "Use to exclude accessories and get actual products.",
           },
         },
-        required: ["query"],
+        required: ["q"],
       },
     },
     {
       name: "get_product",
-      description: "Fetch full details for a single product by its BuyWhere product ID.",
+      description: "Get a specific product by its ID, including full details and current price.",
       inputSchema: {
         type: "object",
         properties: {
-          product_id: {
+          id: {
             type: "string",
-            description: "The BuyWhere product ID (returned by search_products as product_id)",
+            description: "Product UUID",
           },
         },
-        required: ["product_id"],
+        required: ["id"],
       },
     },
     {
-      name: "get_price",
-      description:
-        "Get current prices for a product across all available merchants. " +
-        "Returns a ranked list of listings with price, shipping, merchant rating, and stock status. " +
-        "Use this to find the cheapest place to buy a specific product.",
+      name: "compare_products",
+      description: "Compare multiple products side-by-side. Returns price, brand, rating, and category for each.",
       inputSchema: {
         type: "object",
         properties: {
-          product_id: {
-            type: "string",
-            description: "The BuyWhere product ID",
-          },
-        },
-        required: ["product_id"],
-      },
-    },
-    {
-      name: "compare_prices",
-      description:
-        "Compare 2–5 products side-by-side. Returns structured differentiators, price range, " +
-        "pros/cons, and a best-value recommendation — purpose-built for AI agent decision-making.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          product_ids: {
+          ids: {
             type: "array",
             items: { type: "string" },
-            description: "Array of 2–5 BuyWhere product IDs to compare",
+            description: "Array of product IDs to compare (2-10)",
             minItems: 2,
-            maxItems: 5,
+            maxItems: 10,
           },
         },
-        required: ["product_ids"],
+        required: ["ids"],
       },
     },
     {
-      name: "get_affiliate_link",
+      name: "get_deals",
       description:
-        "Get the click-tracked BuyWhere affiliate link for a product. " +
-        "Share this link with users — it logs the referral and redirects to the merchant page. " +
-        "Always use this instead of raw product URLs when sharing links.",
+        "Get discounted products sorted by discount percentage. Returns products with original price and discount percentage. " +
+        "Supports currency, region (sea, us, eu, au) and country (SG, US, VN, MY, ...) filters.",
       inputSchema: {
         type: "object",
         properties: {
-          product_id: {
+          min_discount: {
+            type: "number",
+            description: "Minimum discount percentage (default 10)",
+            default: 10,
+          },
+          currency: {
             type: "string",
-            description: "The BuyWhere product ID",
+            description: "Filter by currency code (SGD, USD, MYR, VND, THB). Defaults to SGD.",
+            default: "SGD",
+          },
+          region: {
+            type: "string",
+            description: "Filter by region (sea, us, eu, au)",
+          },
+          country_code: {
+            type: "string",
+            enum: ["SG", "US", "VN", "TH", "MY"],
+            description: "Filter by ISO country code. Alias: country.",
+          },
+          country: {
+            type: "string",
+            description: "Alias for country_code (deprecated, use country_code)",
+          },
+          limit: {
+            type: "integer",
+            description: "Number of results (max 100, default 20)",
+            default: 20,
+          },
+          offset: {
+            type: "integer",
+            description: "Pagination offset",
+            default: 0,
           },
         },
-        required: ["product_id"],
       },
     },
     {
-      name: "get_catalog",
-      description:
-        "List available product categories in the BuyWhere catalog. " +
-        "Use this to discover what categories exist before searching or filtering.",
+      name: "list_categories",
+      description: "List top-level product categories available in the BuyWhere catalog.",
       inputSchema: {
         type: "object",
         properties: {
-          parent_slug: {
+          country_code: {
             type: "string",
-            description: "Parent category slug to list subcategories (optional — omit for top-level categories)",
+            enum: ["SG", "US", "VN", "TH", "MY"],
+            description: "Filter by ISO country code. Defaults to SG.",
+          },
+          country: {
+            type: "string",
+            description: "Alias for country_code (deprecated, use country_code)",
           },
         },
+      },
+    },
+    {
+      name: "find_best_price",
+      description:
+        'Use this whenever a user asks about prices, wants to find the cheapest option, or asks "what\'s the best price for X" ' +
+        'or "where can I buy X for the lowest price". This finds the best current price across all merchants.',
+      inputSchema: {
+        type: "object",
+        properties: {
+          product_name: {
+            type: "string",
+            description:
+              'Product name to find best price for (e.g., "iphone 15 pro 256gb", "samsung galaxy s24")',
+          },
+          category: {
+            type: "string",
+            description: 'Category to filter by (e.g., "electronics", "fashion")',
+          },
+          country_code: {
+            type: "string",
+            enum: ["SG", "MY", "TH", "PH", "VN", "ID", "US"],
+            description: "Country to search in (defaults to SG). Alias: country.",
+          },
+          country: {
+            type: "string",
+            description: "Alias for country_code (deprecated, use country_code)",
+          },
+          region: {
+            type: "string",
+            enum: ["us", "sea"],
+            description: 'Region filter - use "us" for United States or "sea" for Southeast Asia',
+          },
+        },
+        required: ["product_name"],
+      },
+    },
+    {
+      name: "ingest_products",
+      description:
+        "Ingest (upsert) a batch of products into the BuyWhere catalog. Use this to add or update product listings " +
+        "from any merchant/source. Requires a valid API key with ingest permissions. " +
+        "Accepts up to 1000 products per call with source, SKU, title, price, URL, and optional metadata.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          source: {
+            type: "string",
+            description: 'Data source identifier (e.g. "shopee_sg", "amazon_sg", "lazada_sg")',
+          },
+          products: {
+            type: "array",
+            description: "Array of product objects to ingest (max 1000)",
+            items: {
+              type: "object",
+              required: ["sku", "merchant_id", "title", "price", "url"],
+              properties: {
+                sku: { type: "string", description: "Unique stock keeping unit identifier" },
+                merchant_id: { type: "string", description: "Merchant identifier" },
+                title: { type: "string", description: "Product title" },
+                description: { type: "string", description: "Product description" },
+                price: { type: "number", description: "Current price (must be >= 0)" },
+                currency: { type: "string", description: "Currency code (default: SGD)", default: "SGD" },
+                url: { type: "string", description: "Product URL on the merchant site" },
+                image_url: { type: "string", description: "Main product image URL" },
+                category: { type: "string", description: "Product category" },
+                brand: { type: "string", description: "Brand name" },
+                is_active: { type: "boolean", description: "Whether the product is active (default: true)" },
+                is_available: { type: "boolean", description: "Whether the product is in stock" },
+                country_code: { type: "string", description: 'ISO country code (e.g. "SG", "US")' },
+                region: { type: "string", description: 'Region identifier (e.g. "sea", "us")' },
+                metadata: { type: "object", description: "Additional product metadata" },
+              },
+            },
+          },
+        },
+        required: ["source", "products"],
       },
     },
   ],
@@ -302,95 +431,62 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   // ── search_products ──────────────────────────────────────────────────────
   if (name === "search_products") {
-    const query = args.query as string | undefined;
-    if (!query) {
-      throw new McpError(ErrorCode.InvalidParams, "query is required");
+    const q = args.q as string | undefined;
+    if (!q) {
+      throw new McpError(ErrorCode.InvalidParams, "q is required");
     }
 
-    const limit = Math.min(Math.max(1, Number(args.limit ?? 10)), 50);
-    const params: Record<string, string | number | undefined> = {
-      q: query,
-      limit,
-      availability: "in_stock",
-      sort: "relevance",
-    };
+    const limit = Math.min(Math.max(1, Number(args.limit ?? 20)), 100);
+    const params: Record<string, string | number | boolean | undefined> = { q, limit };
+    if (args.offset) params.offset = Number(args.offset);
+    if (args.domain) params.domain = args.domain as string;
+    if (args.region) params.region = args.region as string;
+    if (args.country_code) params.country_code = args.country_code as string;
+    if (args.country) params.country = args.country as string;
+    if (args.min_price !== undefined) params.min_price = Number(args.min_price);
+    if (args.max_price !== undefined) params.max_price = Number(args.max_price);
+    if (args.compact) params.compact = true;
     if (args.category) params.category = args.category as string;
 
-    const data = (await apiFetch("/v1/products/search", params)) as Record<string, unknown>;
+    const data = (await apiFetch("/v1/products/search", params, name)) as Record<string, unknown>;
     const results = (data.results as Array<Record<string, unknown>>) ?? [];
 
     if (results.length === 0) {
       return {
-        content: [
-          { type: "text", text: `No products found for query: "${query}"` },
-        ],
+        content: [{ type: "text", text: `No products found for query: "${q}"` }],
       };
     }
 
     const total = data.total_estimated as number | undefined;
-    const header = `Found ${total ?? results.length} product(s) matching "${query}":`;
+    const header = `Found ${total ?? results.length} product(s) matching "${q}":`;
     const items = results.map((p) => ({ type: "text" as const, text: formatProduct(p) }));
 
-    return {
-      content: [{ type: "text", text: header }, ...items],
-    };
+    return { content: [{ type: "text", text: header }, ...items] };
   }
 
   // ── get_product ──────────────────────────────────────────────────────────
   if (name === "get_product") {
-    const productId = args.product_id as string | undefined;
-    if (!productId) {
-      throw new McpError(ErrorCode.InvalidParams, "product_id is required");
+    const id = (args.id ?? args.product_id) as string | undefined;
+    if (!id) {
+      throw new McpError(ErrorCode.InvalidParams, "id is required");
     }
 
-    const data = (await apiFetch(`/v1/products/${encodeURIComponent(productId)}`)) as Record<string, unknown>;
+    const data = (await apiFetch(`/v1/products/${encodeURIComponent(id)}`, undefined, name)) as Record<string, unknown>;
 
-    return {
-      content: [{ type: "text", text: formatProduct(data) }],
-    };
+    return { content: [{ type: "text", text: formatProduct(data) }] };
   }
 
-  // ── get_price ────────────────────────────────────────────────────────────
-  if (name === "get_price") {
-    const productId = args.product_id as string | undefined;
-    if (!productId) {
-      throw new McpError(ErrorCode.InvalidParams, "product_id is required");
+  // ── compare_products ─────────────────────────────────────────────────────
+  if (name === "compare_products") {
+    const ids = (args.ids ?? args.product_ids) as string[] | undefined;
+    if (!ids || ids.length < 2) {
+      throw new McpError(ErrorCode.InvalidParams, "ids must be an array of 2–10 product IDs");
+    }
+    if (ids.length > 10) {
+      throw new McpError(ErrorCode.InvalidParams, "compare_products supports at most 10 products at once");
     }
 
-    const data = (await apiFetch(`/v1/products/${encodeURIComponent(productId)}/prices`)) as Record<string, unknown>;
-    const listings = (data.listings as Array<Record<string, unknown>>) ?? [];
-    const bestPrice = data.best_price as Record<string, unknown> | undefined;
-    const bestValue = data.best_value as Record<string, unknown> | undefined;
-
-    const lines: string[] = [
-      `**Price comparison for: ${data.canonical_title ?? productId}**`,
-      `${listings.length} listing(s) found:\n`,
-      ...listings.map((lst, i) => `Listing ${i + 1}:\n${formatListing(lst)}`),
-    ];
-
-    if (bestPrice) {
-      lines.push(`\n**Best price:** ${bestPrice.currency ?? "SGD"} ${bestPrice.total} (listing ${bestPrice.listing_id})`);
-    }
-    if (bestValue && bestValue.listing_id !== bestPrice?.listing_id) {
-      lines.push(`**Best value:** ${bestValue.currency ?? "SGD"} ${bestValue.total} — ${bestValue.rationale ?? ""} (listing ${bestValue.listing_id})`);
-    }
-
-    return {
-      content: [{ type: "text", text: lines.join("\n") }],
-    };
-  }
-
-  // ── compare_prices ───────────────────────────────────────────────────────
-  if (name === "compare_prices") {
-    const productIds = args.product_ids as string[] | undefined;
-    if (!productIds || productIds.length < 2) {
-      throw new McpError(ErrorCode.InvalidParams, "product_ids must be an array of 2–5 product IDs");
-    }
-    if (productIds.length > 5) {
-      throw new McpError(ErrorCode.InvalidParams, "compare_prices supports at most 5 products at once");
-    }
-
-    const data = (await apiFetch("/v1/products/compare", { ids: productIds.join(",") })) as Record<string, unknown>;
+    const data = (await apiFetch("/v1/products/compare", { ids: ids.join(",") }, name)) as Record<string, unknown>;
     const products = (data.products as Array<Record<string, unknown>>) ?? [];
     const comparison = data.comparison as Record<string, unknown> | undefined;
 
@@ -403,7 +499,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         `  Price: ${price?.currency ?? "SGD"} ${price?.amount ?? "N/A"}`,
         `  Category: ${p.category ?? ""}`,
         `  Merchant: ${(p.merchant as Record<string, unknown>)?.name ?? ""}`,
-        `  URL: ${p.source_url ?? ""}`,
+        `  URL: ${p.source_url ?? p.url ?? ""}`,
         "",
       );
     }
@@ -426,72 +522,67 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
 
-    return {
-      content: [{ type: "text", text: lines.join("\n") }],
-    };
+    return { content: [{ type: "text", text: lines.join("\n") }] };
   }
 
-  // ── get_affiliate_link ───────────────────────────────────────────────────
-  if (name === "get_affiliate_link") {
-    const productId = args.product_id as string | undefined;
-    if (!productId) {
-      throw new McpError(ErrorCode.InvalidParams, "product_id is required");
+  // ── get_deals ────────────────────────────────────────────────────────────
+  if (name === "get_deals") {
+    const limit = Math.min(Math.max(1, Number(args.limit ?? 20)), 100);
+    const params: Record<string, string | number | undefined> = { limit };
+    if (args.min_discount !== undefined) params.min_discount = Number(args.min_discount);
+    if (args.currency) params.currency = args.currency as string;
+    if (args.region) params.region = args.region as string;
+    if (args.country_code) params.country_code = args.country_code as string;
+    if (args.country) params.country = args.country as string;
+    if (args.offset) params.offset = Number(args.offset);
+
+    const data = (await apiFetch("/v1/deals", params, name)) as Record<string, unknown>;
+    const results = (data.results ?? data.deals ?? data) as Array<Record<string, unknown>>;
+    const items = Array.isArray(results) ? results : [];
+
+    if (items.length === 0) {
+      return { content: [{ type: "text", text: "No deals found matching the given criteria." }] };
     }
 
-    // Fetch product name for context
-    let productName = productId;
-    try {
-      const product = (await apiFetch(`/v1/products/${encodeURIComponent(productId)}`)) as Record<string, unknown>;
-      productName = (product.title ?? product.name ?? productId) as string;
-    } catch {
-      // Non-fatal — still return the link
+    const lines: string[] = [`**${items.length} deal(s) found:**\n`];
+    for (const item of items) {
+      const price = item.price as Record<string, unknown> | undefined;
+      const originalPrice = item.original_price as Record<string, unknown> | undefined;
+      const discount = item.discount_percentage ?? item.discount_pct ?? "";
+      lines.push(
+        `**${item.title ?? item.name}**`,
+        `  Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}` +
+          (originalPrice ? ` (was ${originalPrice.currency ?? "SGD"} ${originalPrice.amount})` : ""),
+        discount ? `  Discount: ${discount}%` : "",
+        `  URL: ${item.source_url ?? item.url ?? ""}`,
+        "",
+      );
     }
 
-    const affiliateUrl = `${BASE_URL}/r/${encodeURIComponent(productId)}`;
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: [
-            `**Affiliate link for: ${productName}**`,
-            ``,
-            `URL: ${affiliateUrl}`,
-            ``,
-            `This is a click-tracked BuyWhere link. When a user visits it, BuyWhere logs the referral and redirects to the merchant page.`,
-          ].join("\n"),
-        },
-      ],
-    };
+    return { content: [{ type: "text", text: lines.filter(Boolean).join("\n") }] };
   }
 
-  // ── get_catalog ──────────────────────────────────────────────────────────
-  if (name === "get_catalog") {
-    const parentSlug = args.parent_slug as string | undefined;
+  // ── list_categories ──────────────────────────────────────────────────────
+  if (name === "list_categories") {
+    const params: Record<string, string | undefined> = {};
+    if (args.country_code) params.country_code = args.country_code as string;
+    if (args.country) params.country = args.country as string;
 
-    let data: unknown;
-    if (parentSlug) {
-      data = await apiFetch(`/v1/categories/${encodeURIComponent(parentSlug)}`);
-    } else {
-      data = await apiFetch("/v1/categories");
-    }
-
+    const data = await apiFetch("/v1/categories", Object.keys(params).length ? params : undefined, name);
     const categories = Array.isArray(data)
       ? data
       : ((data as Record<string, unknown>).categories as unknown[]) ?? [data];
 
     const lines: string[] = [
-      parentSlug
-        ? `**Subcategories of "${parentSlug}":**`
-        : `**BuyWhere product catalog — top-level categories:**`,
+      `**BuyWhere product catalog — top-level categories${params.country_code ? ` (${params.country_code})` : ""}:**`,
       "",
     ];
 
     for (const cat of categories as Array<Record<string, unknown>>) {
-      const name = cat.name ?? cat.slug ?? cat.id ?? "Unknown";
+      const catName = cat.name ?? cat.slug ?? cat.id ?? "Unknown";
       const slug = cat.slug ?? cat.id ?? "";
       const count = cat.product_count ?? cat.count ?? "";
-      lines.push(`• **${name}** (slug: \`${slug}\`)${count ? `  — ${count} products` : ""}`);
+      lines.push(`• **${catName}** (slug: \`${slug}\`)${count ? `  — ${count} products` : ""}`);
       const subcats = cat.subcategories as Array<Record<string, unknown>> | undefined;
       if (subcats?.length) {
         for (const sub of subcats) {
@@ -500,8 +591,84 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
 
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  }
+
+  // ── find_best_price ──────────────────────────────────────────────────────
+  if (name === "find_best_price") {
+    const productName = args.product_name as string | undefined;
+    if (!productName) {
+      throw new McpError(ErrorCode.InvalidParams, "product_name is required");
+    }
+
+    const params: Record<string, string | number | undefined> = {
+      q: productName,
+      limit: 1,
+      sort: "price_asc",
+    };
+    if (args.category) params.category = args.category as string;
+    if (args.country_code) params.country_code = args.country_code as string;
+    if (args.country) params.country = args.country as string;
+    if (args.region) params.region = args.region as string;
+
+    const data = (await apiFetch("/v1/products/search", params, name)) as Record<string, unknown>;
+    const results = (data.results as Array<Record<string, unknown>>) ?? [];
+
+    if (results.length === 0) {
+      return {
+        content: [{ type: "text", text: `No products found for: "${productName}"` }],
+      };
+    }
+
+    const best = results[0];
+    const price = best.price as Record<string, unknown> | undefined;
+    const merchant = best.merchant as Record<string, unknown> | undefined;
+
+    const lines: string[] = [
+      `**Best price for "${productName}":**`,
+      "",
+      `**${best.title ?? best.name}**`,
+      `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}`,
+      `Merchant: ${merchant?.name ?? merchant?.merchant_id ?? ""} ${merchant?.platform ? `(${merchant.platform})` : ""}`,
+      `URL: ${best.source_url ?? best.url ?? ""}`,
+      `ID: ${best.product_id ?? best.id}`,
+    ];
+
+    return { content: [{ type: "text", text: lines.join("\n") }] };
+  }
+
+  // ── ingest_products ──────────────────────────────────────────────────────
+  if (name === "ingest_products") {
+    const source = args.source as string | undefined;
+    if (!source) {
+      throw new McpError(ErrorCode.InvalidParams, "source is required");
+    }
+    const products = args.products as unknown[] | undefined;
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      throw new McpError(ErrorCode.InvalidParams, "products must be a non-empty array");
+    }
+    if (products.length > 1000) {
+      throw new McpError(ErrorCode.InvalidParams, "products array must not exceed 1000 items per call");
+    }
+
+    const data = (await apiPost("/v1/products/ingest", { source, products }, name)) as Record<string, unknown>;
+
     return {
-      content: [{ type: "text", text: lines.join("\n") }],
+      content: [
+        {
+          type: "text",
+          text: [
+            `**Ingest complete**`,
+            `Source: ${source}`,
+            `Submitted: ${products.length} product(s)`,
+            data.ingested !== undefined ? `Ingested: ${data.ingested}` : "",
+            data.skipped !== undefined ? `Skipped: ${data.skipped}` : "",
+            data.errors !== undefined ? `Errors: ${data.errors}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        },
+      ],
     };
   }
 
@@ -550,7 +717,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
   }
 
   const country = match[1];
-  const data = await apiFetch("/v1/categories");
+  const data = await apiFetch("/v1/categories", undefined, "resource:catalog");
 
   return {
     contents: [

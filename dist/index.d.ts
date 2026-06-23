@@ -9,10 +9,11 @@
  * Tools:
  *   search_products   — keyword / natural-language product search
  *   get_product       — fetch a single product by ID
- *   get_price         — compare prices for a product across all merchants
- *   compare_prices    — side-by-side comparison of 2–5 products
- *   get_affiliate_link — get the click-tracked affiliate URL for a product
- *   get_catalog       — list available product categories
+ *   compare_products  — side-by-side comparison of 2–10 products
+ *   get_deals         — discounted products sorted by discount %
+ *   list_categories   — list available product categories
+ *   find_best_price   — find cheapest option across all merchants
+ *   ingest_products   — batch-upsert products into the catalog (API key required)
  *
  * Resources:
  *   buywhere://catalog/{country}  — list available categories for a country
