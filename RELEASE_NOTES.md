@@ -1,15 +1,18 @@
-# @buywhere/mcp-server v0.3.6
+# @buywhere/mcp-server v1.1.0
 
-Released: 2026-05-05
+Released: 2026-06-25
 
 ## Changes
 
-- **Product Hunt badge** — Added "Launched on Product Hunt May 6" badge with placeholder link to README
-- **Updated package metadata** — Improved description, expanded keywords, funding info, and repository links
-- **Patch release** — Bumped from 0.3.5 to 0.3.6
+- **Klarna Agentic Product Protocol integration** — New `src/klarna-adapter.ts` module merges US product search results from Klarna's agentic commerce API into BuyWhere MCP tools.
+  - `search_products` — Klarna US results merge inline when `country=us` and `KLARNA_API_TOKEN` is set
+  - `get_product` — Routes `krn:kpdc:product:*` IDs to Klarna API
+  - `find_best_price` — Klarna-first short-circuit for US queries
+  - All Klarna results tagged with `source: "klarna"` provenance
+  - Non-fatal degradation if `KLARNA_API_TOKEN` is absent
 
-## Previous Release
+- **README** — Added Klarna integration section with configuration docs and badge
 
-### v1.0.0 (unpublished)
+## Built on Klarna Agentic Product Protocol
 
-MCP server for product search, price comparison, and affiliate-ready shopping workflows across Singapore, SEA, and US markets.
+This integration uses the Klarna Agentic Product Protocol API (v2) for US product search.
