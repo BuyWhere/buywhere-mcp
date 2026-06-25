@@ -433,3 +433,25 @@ If you find this project useful:
 ## License
 
 MIT
+
+## Klarna Integration
+
+BuyWhere integrates with the [Klarna Agentic Product Protocol](https://docs.klarna.com/agentic-product-protocol) for US product search.
+
+[![Built on Klarna Agentic Product Protocol](https://img.shields.io/badge/Klarna-Agentic%20Product%20Protocol-ffb3c7?logo=klarna)](https://docs.klarna.com/agentic-product-protocol)
+
+When `KLARNA_API_TOKEN` is configured, the MCP server automatically merges Klarna US product results into:
+
+- **`search_products`** — Klarna US results appear alongside BuyWhere results when `country=us`
+- **`get_product`** — Product IDs with the `krn:kpdc:product:*` prefix are routed to Klarna's API
+- **`find_best_price`** — Tries Klarna first for US queries when BuyWhere has no results
+
+All Klarna-sourced products include `source: "klarna"` provenance metadata.
+
+### Configuration
+
+```env
+KLARNA_API_TOKEN=your_klarna_agentic_token_here
+```
+
+To get a token, contact [agenticcommerce@klarna.com](mailto:agenticcommerce@klarna.com).
