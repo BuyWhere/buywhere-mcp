@@ -21,11 +21,13 @@
  * Configuration (environment variables):
  *   BUYWHERE_API_KEY  (required) — your BuyWhere API key
  *   BUYWHERE_API_URL  (optional) — override base URL (default: https://api.buywhere.ai)
+ *   KLARNA_API_TOKEN   (optional) — Klarna Agentic Product Protocol token for US product search
  */
 import { fileURLToPath } from "url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ErrorCode, ListResourcesRequestSchema, ListToolsRequestSchema, McpError, ReadResourceRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
+import { searchKlarna, getKlarnaOffers, pickBestOffer, formatKlarnaForBuyWhere, } from "./klarna-adapter.js";
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
@@ -407,14 +409,50 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
         const total = data.total_estimated;
         const header = `Found ${total ?? results.length} product(s) matching "${q}":`;
+        // Merge Klarna US results when configured
+        let klarnaItems = [];
+        if ((args.country === "us" || args.country_code === "us" || args.region === "us") &&
+            process.env.KLARNA_API_TOKEN) {
+            try {
+                const klarnaResults = await searchKlarna(q, "us", Math.min(limit, 5));
+                klarnaItems = klarnaResults.products.map((p) => ({
+                    type: "text",
+                    text: [
+                        `**${p.title}**`,
+                        `Source: Klarna (US)`,
+                        p.price?.amount ? `Price: $${p.price.amount.toFixed(2)} USD` : "",
+                        p.merchant?.name ? `Merchant: ${p.merchant.name}` : "",
+                        p.url ? `URL: ${p.url}` : "",
+                        `ID: krn:kpdc:product:${p.id}`,
+                    ].filter(Boolean).join("\n"),
+                }));
+            }
+            catch (_e) {
+                // Klarna error is non-fatal; fall through to BuyWhere-only results
+            }
+        }
         const items = results.map((p) => ({ type: "text", text: formatProduct(p) }));
-        return { content: [{ type: "text", text: header }, ...items] };
+        return { content: [{ type: "text", text: header }, ...items, ...klarnaItems] };
     }
     // ── get_product ──────────────────────────────────────────────────────────
     if (name === "get_product") {
         const id = (args.id ?? args.product_id);
         if (!id) {
             throw new McpError(ErrorCode.InvalidParams, "id is required");
+        }
+        // Route Klarna product IDs to Klarna API
+        if (id.startsWith("krn:kpdc:product:")) {
+            if (!process.env.KLARNA_API_TOKEN) {
+                throw new McpError(ErrorCode.InvalidParams, "KLARNA_API_TOKEN not configured");
+            }
+            const klarnaId = id.replace("krn:kpdc:product:", "");
+            const offers = await getKlarnaOffers(klarnaId);
+            const bestOffer = pickBestOffer(offers);
+            if (!bestOffer) {
+                throw new McpError(ErrorCode.InternalError, "No offers found for Klarna product " + klarnaId);
+            }
+            const formatted = formatKlarnaForBuyWhere(bestOffer);
+            return { content: [{ type: "text", text: JSON.stringify(formatted, null, 2) }] };
         }
         const data = (await apiFetch(`/v1/products/${encodeURIComponent(id)}`, undefined, name));
         return { content: [{ type: "text", text: formatProduct(data) }] };
@@ -537,6 +575,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             params.region = args.region;
         const data = (await apiFetch("/v1/products/search", params, name));
         const results = data.results ?? [];
+        // For US queries, try Klarna parallel best-price lookup when BuyWhere has no results
+        if (results.length === 0 && process.env.KLARNA_API_TOKEN) {
+            try {
+                const klarnaResults = await searchKlarna(productName, "us", 1);
+                if (klarnaResults.products.length > 0) {
+                    const bp = klarnaResults.products[0];
+                    return {
+                        content: [{ type: "text", text: [
+                                    `**Best price for "${productName}":**`,
+                                    "",
+                                    `**${bp.title}**`,
+                                    bp.price?.amount ? `Price: $${bp.price.amount.toFixed(2)} USD` : "",
+                                    bp.merchant?.name ? `Merchant: ${bp.merchant.name}` : "",
+                                    bp.url ? `URL: ${bp.url}` : "",
+                                    `ID: krn:kpdc:product:${bp.id}`,
+                                    `Source: Klarna (US)`,
+                                ].filter(Boolean).join("\n") }],
+                    };
+                }
+            }
+            catch (_e) {
+                // Klarna error is non-fatal
+            }
+        }
         if (results.length === 0) {
             return {
                 content: [{ type: "text", text: `No products found for: "${productName}"` }],
