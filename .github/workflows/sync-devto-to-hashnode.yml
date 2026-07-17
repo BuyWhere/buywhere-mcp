@@ -1,0 +1,40 @@
+name: Sync Dev.to Posts To Hashnode
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-devto-to-hashnode:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate Hashnode publish files from Dev.to
+        env:
+          DEVTO_USERNAME: buywhere
+          HASHNODE_PUBLICATION_DOMAIN: buywhere.hashnode.dev
+          DEVTO_SYNC_PUBLISHED_AFTER: 2026-05-29T00:00:00Z
+          MAX_NEW_POSTS_PER_RUN: "10"
+          DEVTO_API_KEY: ${{ secrets.DEV_TO_API_KEY }}
+        run: node scripts/sync-devto-to-hashnode.mjs
+
+      - name: Commit generated Hashnode publish files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: sync dev.to posts for Hashnode publishing"
+          git push
