@@ -186,8 +186,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "search_products",
       description:
-        "Search the BuyWhere product catalog by keyword. Returns products from e-commerce platforms across " +
-        "multiple regions (Singapore, US, etc.). Use compact=true for agent-optimized responses with " +
+        "Search the BuyWhere product catalog by keyword. Returns schema.org/Product entities with " +
+        "name, description, image, and offers (schema.org/AggregateOffer with lowPrice, highPrice, " +
+        "priceCurrency). Covers e-commerce platforms across Singapore, Malaysia, Indonesia, " +
+        "Thailand, Vietnam, and US. Use compact=true for agent-optimized responses with " +
         "structured_specs, comparison_attributes, and normalized_price_usd fields.",
       inputSchema: {
         type: "object",
@@ -283,8 +285,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "get_deals",
       description:
-        "Get discounted products sorted by discount percentage. Returns products with original price and discount percentage. " +
-        "Supports currency, region (sea, us, eu, au) and country (SG, US, VN, MY, ...) filters.",
+        "Get discounted products sorted by discount percentage. Returns schema.org/Product entities with " +
+        "schema.org/Offer properties: price, priceCurrency, availability, originalPrice, and " +
+        "discountPercentage. Covers Singapore, Malaysia, Indonesia, Thailand, Vietnam, and US e-commerce.",
       inputSchema: {
         type: "object",
         properties: {
@@ -346,7 +349,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       name: "find_best_price",
       description:
         'Use this whenever a user asks about prices, wants to find the cheapest option, or asks "what\'s the best price for X" ' +
-        'or "where can I buy X for the lowest price". This finds the best current price across all merchants.',
+        'or "where can I buy X for the lowest price". Returns a schema.org/AggregateOffer with lowPrice, ' +
+        'highPrice, priceCurrency, and offerCount, plus individual schema.org/Offer entries with merchant ' +
+        'name, product URL, and availability across all supported merchants.', 
       inputSchema: {
         type: "object",
         properties: {
