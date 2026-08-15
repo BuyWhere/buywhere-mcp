@@ -96,6 +96,24 @@ async function apiPost(path, body, toolName = "unknown") {
 // ---------------------------------------------------------------------------
 // Format helpers
 // ---------------------------------------------------------------------------
+// Sentinel-price guard (BUY-65574 band-aid, parent BUY-65559):
+// catalog rows where `price.amount < 10` (or non-finite / null) are produced by
+// the BuyWhere ingest pipeline when the merchant page had no parseable price;
+// the scraper writes `1` as a placeholder, which the front-end renders as
+// `.00`. Until BUY-52807 ships an ingest-time sanity bound, surface a "see
+// merchant" hint so MCP clients (AI agents) do not quote a fake price.
+const PRICE_SENTINEL_MIN = 10;
+const PRICE_UNAVAILABLE_TEXT = "see merchant (price unavailable in catalog) — click through to confirm";
+function isSentinelPrice(amount) {
+    return typeof amount !== "number" || !Number.isFinite(amount) || amount < PRICE_SENTINEL_MIN;
+}
+function formatPriceLine(price, url) {
+    if (!price || isSentinelPrice(price.amount)) {
+        const link = url ? ` — ${url}` : "";
+        return `Price: ${PRICE_UNAVAILABLE_TEXT}${link}`;
+    }
+    return `Price: ${price.currency ?? "SGD"} ${price.amount}`;
+}
 function formatProduct(p) {
     const price = p.price;
     const merchant = p.merchant;
@@ -104,7 +122,7 @@ function formatProduct(p) {
     const lines = [
         `**${p.title ?? p.name}**`,
         `ID: ${p.product_id ?? p.id}`,
-        `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}`,
+        formatPriceLine(price, p.source_url),
         `Category: ${p.category ?? ""}`,
         `Merchant: ${merchant?.name ?? merchant?.merchant_id ?? ""}` +
             (merchant?.platform ? ` (${merchant.platform})` : ""),
@@ -434,7 +452,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const lines = [`**Product comparison (${products.length} items):**\n`];
         for (const p of products) {
             const price = p.price;
-            lines.push(`**${p.title ?? p.name}** (ID: ${p.product_id ?? p.id})`, `  Price: ${price?.currency ?? "SGD"} ${price?.amount ?? "N/A"}`, `  Category: ${p.category ?? ""}`, `  Merchant: ${p.merchant?.name ?? ""}`, `  URL: ${p.source_url ?? p.url ?? ""}`, "");
+            lines.push(`**${p.title ?? p.name}** (ID: ${p.product_id ?? p.id})`, formatPriceLine(price, p.source_url).replace(/^Price:/, "  Price:"), `  Category: ${p.category ?? ""}`, `  Merchant: ${p.merchant?.name ?? ""}`, `  URL: ${p.source_url ?? p.url ?? ""}`, "");
         }
         if (comparison) {
             const priceRange = comparison.price_range;
@@ -549,7 +567,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             `**Best price for "${productName}":**`,
             "",
             `**${best.title ?? best.name}**`,
-            `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}`,
+            formatPriceLine(price, best.source_url),
             `Merchant: ${merchant?.name ?? merchant?.merchant_id ?? ""} ${merchant?.platform ? `(${merchant.platform})` : ""}`,
             `URL: ${best.source_url ?? best.url ?? ""}`,
             `ID: ${best.product_id ?? best.id}`,

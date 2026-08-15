@@ -132,6 +132,31 @@ async function apiPost(path: string, body: unknown, toolName = "unknown"): Promi
 // Format helpers
 // ---------------------------------------------------------------------------
 
+// Sentinel-price guard (BUY-65574 band-aid, parent BUY-65559):
+// catalog rows where `price.amount < 10` (or non-finite / null) are produced by
+// the BuyWhere ingest pipeline when the merchant page had no parseable price;
+// the scraper writes `1` as a placeholder, which the front-end renders as
+// `.00`. Until BUY-52807 ships an ingest-time sanity bound, surface a "see
+// merchant" hint so MCP clients (AI agents) do not quote a fake price.
+const PRICE_SENTINEL_MIN = 10;
+const PRICE_UNAVAILABLE_TEXT =
+  "see merchant (price unavailable in catalog) — click through to confirm";
+
+function isSentinelPrice(amount: unknown): boolean {
+  return typeof amount !== "number" || !Number.isFinite(amount) || amount < PRICE_SENTINEL_MIN;
+}
+
+function formatPriceLine(
+  price: Record<string, unknown> | undefined,
+  url: string | undefined,
+): string {
+  if (!price || isSentinelPrice(price.amount)) {
+    const link = url ? ` — ${url}` : "";
+    return `Price: ${PRICE_UNAVAILABLE_TEXT}${link}`;
+  }
+  return `Price: ${(price.currency as string | undefined) ?? "SGD"} ${price.amount}`;
+}
+
 function formatProduct(p: Record<string, unknown>): string {
   const price = p.price as Record<string, unknown> | undefined;
   const merchant = p.merchant as Record<string, unknown> | undefined;
@@ -141,7 +166,7 @@ function formatProduct(p: Record<string, unknown>): string {
   const lines: string[] = [
     `**${p.title ?? p.name}**`,
     `ID: ${p.product_id ?? p.id}`,
-    `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}`,
+    formatPriceLine(price, p.source_url as string | undefined),
     `Category: ${p.category ?? ""}`,
     `Merchant: ${merchant?.name ?? merchant?.merchant_id ?? ""}` +
       (merchant?.platform ? ` (${merchant.platform})` : ""),
@@ -501,7 +526,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const price = p.price as Record<string, unknown> | undefined;
       lines.push(
         `**${p.title ?? p.name}** (ID: ${p.product_id ?? p.id})`,
-        `  Price: ${price?.currency ?? "SGD"} ${price?.amount ?? "N/A"}`,
+        formatPriceLine(price, p.source_url as string | undefined).replace(/^Price:/, "  Price:"),
         `  Category: ${p.category ?? ""}`,
         `  Merchant: ${(p.merchant as Record<string, unknown>)?.name ?? ""}`,
         `  URL: ${p.source_url ?? p.url ?? ""}`,
@@ -633,7 +658,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       `**Best price for "${productName}":**`,
       "",
       `**${best.title ?? best.name}**`,
-      `Price: ${price?.currency ?? "SGD"} ${price?.amount ?? price?.total ?? "N/A"}`,
+      formatPriceLine(price, best.source_url as string | undefined),
       `Merchant: ${merchant?.name ?? merchant?.merchant_id ?? ""} ${merchant?.platform ? `(${merchant.platform})` : ""}`,
       `URL: ${best.source_url ?? best.url ?? ""}`,
       `ID: ${best.product_id ?? best.id}`,
