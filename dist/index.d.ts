@@ -21,6 +21,7 @@
  * Configuration (environment variables):
  *   BUYWHERE_API_KEY  (required) — your BuyWhere API key
  *   BUYWHERE_API_URL  (optional) — override base URL (default: https://api.buywhere.ai)
+ *   KLARNA_API_TOKEN   (optional) — Klarna Agentic Product Protocol token for US product search
  */
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 export declare function createSandboxServer(): Server<{
