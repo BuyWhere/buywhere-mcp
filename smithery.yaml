@@ -1,18 +1,28 @@
 # Smithery MCP server manifest — https://smithery.ai
 # BuyWhere: Agent-native product catalog API for Southeast Asia commerce
+# v1.1.0 — P2.7 surface refresh. Lead with deliver_to REQUIRED contract for v2.
 
 name: buywhere
 displayName: BuyWhere MCP Server
 description: >
-  Agent-native product catalog API. Search products across Shopee, Lazada, Amazon SG,
-  Amazon US, Walmart, Carousell, FairPrice, Harvey Norman, and 20+ e-commerce platforms.
-  Compare products, find deals, browse categories, and get the best price — all through
-  a single MCP endpoint.
+  Agent-native product catalog API for AI agents. Every search/best-price/deals
+  call requires the end-user's ISO 3166-1 alpha-2 country code as `deliver_to`
+  (e.g. SG, US, MY, TH, ID, VN, PH, GB, AU, IN), so results are ranked for
+  products your user can actually receive, with per-row availability labels.
 
-  📚 Read our engineering blog at https://buywhere.ai/blog for MCP server guides,
-  ecommerce deep-dives, and agent-native commerce learnings.
+  Cover 7+ merchants — Shopee, Lazada, Amazon SG, Amazon US, Walmart, FairPrice,
+  Carousell, Harvey Norman — across Singapore and the United States. Search
+  products (search_products_v2), retrieve a known product (get_product_v2),
+  compare 2–10 listings side-by-side (compare_products_v2), find the cheapest
+  deliverable listing (find_best_price_v2), and surface discounted stock
+  (get_deals_v2).
 
-version: 1.0.0
+  Free tier: 1,000 calls/month. API key at https://buywhere.ai/api-keys.
+
+  📚 Agent-developer guide: https://api.buywhere.ai/docs/agent-dx
+  📚 Engineering blog: https://buywhere.ai/blog
+
+version: 1.1.0
 license: MIT
 
 mcp:
@@ -23,41 +33,41 @@ mcp:
       API key required. Get a free key at https://buywhere.ai/api-keys.
       Free tier: 1,000 calls/month. No credit card required.
 
+# v2 tool surface — every search/price/deals tool requires deliver_to on v2.
+# v2 ships in the upcoming P2.7 release; until then these names document the
+# contract and the live v1 surface (search_products, get_product, find_best_price,
+# get_deals, compare_products, list_categories) remains callable. See
+# https://api.buywhere.ai/docs/agent-dx for v1 ↔ v2 migration.
 tools:
-  - name: search_products
+  - name: search_products_v2
     description: >
-      Search the BuyWhere product catalog by keyword. Returns products from e-commerce platforms
-      across multiple regions (Singapore, US, etc.). Supports price range, region, country, domain,
-      and category filters. Use compact=true for agent-optimized responses.
+      Search the BuyWhere product catalog by keyword. v2 REQUIRES `deliver_to`
+      (ISO 3166-1 alpha-2 country code) so results are ranked for the end user's
+      market with per-row availability. Optional filters: category, min_price,
+      max_price, source (merchant), include_unshippable, limit (1–50).
 
-  - name: get_product
+  - name: get_product_v2
     description: >
-      Get a specific product by its ID, including full details and current price.
+      Retrieve full details for a specific BuyWhere product by ID. v2 returns
+      the same shape as v1 plus per-row `availability` for the current market
+      (use `deliver_to` to scope availability).
 
-  - name: compare_products
+  - name: compare_products_v2
     description: >
-      Compare multiple products side-by-side (2–10 products). Returns price, brand, rating,
-      and category for each product.
+      Compare 2–10 products side-by-side across merchants. v2 lets callers
+      scope the comparison to a market with `deliver_to`.
 
-  - name: get_deals
+  - name: get_deals_v2
     description: >
-      Get discounted products sorted by discount percentage. Returns products with original price
-      and discount percentage. Supports currency, region (sea, us, eu, au), and country filters.
+      Find products with significant price drops, deliverability-filtered.
+      v2 REQUIRES `deliver_to`. Optional: category, min_discount_pct,
+      include_unshippable, limit.
 
-  - name: list_categories
+  - name: find_best_price_v2
     description: >
-      List top-level product categories available in the BuyWhere catalog.
-      Supports country_code filter (SG, US, VN, TH, MY).
-
-  - name: find_best_price
-    description: >
-      Find the best current price for a product by name across all merchants.
-      Use this when a user asks "what's the best price for X" or "where can I buy X cheapest".
-
-  - name: ingest_products
-    description: >
-      Batch-upsert up to 1000 products into the BuyWhere catalog from any merchant or source.
-      Requires an API key with ingest permissions.
+      Find the cheapest deliverable listing for a product across covered
+      merchants. v2 REQUIRES `deliver_to`. Optional: category,
+      include_unshippable.
 
 categories:
   - Commerce
@@ -79,6 +89,8 @@ keywords:
   - ai agent
   - mcp
   - commerce api
+  - deliver_to
+  - availability
 
 author:
   name: BuyWhere
@@ -86,7 +98,7 @@ author:
   url: https://buywhere.ai
 
 homepage: https://buywhere.ai
-documentation: https://api.buywhere.ai/docs/guides/mcp
+documentation: https://api.buywhere.ai/docs/agent-dx
 repository: https://github.com/BuyWhere/buywhere-mcp
 
 startCommand:
@@ -126,11 +138,29 @@ regions:
   - Malaysia (MY)
 
 features:
-  - Real-time product search across Singapore and US merchants
-  - Cross-merchant price comparison
+  - deliver_to required on v2 search/best-price/deals (ISO 3166-1 alpha-2)
+  - Per-row availability labels (in_stock, out_of_stock, preorder, discontinued, unshippable)
+  - Cross-merchant price comparison across Shopee, Lazada, Amazon SG/US, Walmart, FairPrice, Carousell
   - Discount/deal discovery
-  - Category browsing
   - Multi-currency support (SGD, USD, MYR, IDR, THB, PHP, VND)
-  - Region-filtered search
   - Compact JSON mode for AI agents
   - Free tier available (1,000 calls/month)
+
+# Sunset / deprecation notice (P2.7)
+deprecation:
+  notice: |
+    The v1 tool names (search_products, find_best_price, get_deals) are entering
+    a sunset window. v1 stays callable through 2026-12-31Z, then returns 410.
+    Forward path is the v2 tool names above with deliver_to required.
+  v1_deprecates_on: "2026-10-01T00:00:00Z"
+  v1_retires_on:    "2026-12-31T00:00:00Z"
+  migration_guide: "https://api.buywhere.ai/docs/agent-dx#migration-guide-v1-v2"
+
+# 60-second quickstart (works against the live endpoint today, returns 200).
+# v2 ships in P2.7 — until then, this v1 call still returns results. Migrating
+# is a one-liner: drop the `_v2` suffix and add `deliver_to`.
+quickstart: |
+  curl -s -X POST https://api.buywhere.ai/mcp \
+    -H "Authorization: Bearer $BUYWHERE_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"search_products","arguments":{"q":"wireless headphones","limit":5}}}'

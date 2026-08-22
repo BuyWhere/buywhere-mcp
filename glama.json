@@ -6,8 +6,50 @@
   "categories": [
     "AI & Machine Learning",
     "Developer Tools",
-    "Product Search"
+    "Product Search",
+    "Price Comparison"
   ],
   "website": "https://buywhere.ai",
-  "blog": "https://buywhere.ai/blog"
+  "blog": "https://buywhere.ai/blog",
+  "description": "Agent-native product catalog API. v2 tool surface (search_products_v2, get_product_v2, compare_products_v2, find_best_price_v2, get_deals_v2) requires the end-user's ISO 3166-1 alpha-2 country code as `deliver_to` on every search/price/deals call, so results are ranked for products your user can actually receive with per-row availability. Covers 7+ merchants across Singapore and the United States. Free tier: 1,000 calls/month. Get an API key at https://buywhere.ai/api-keys. Migration guide: https://api.buywhere.ai/docs/agent-dx",
+  "tools": [
+    {
+      "name": "search_products_v2",
+      "description": "Search the BuyWhere product catalog by keyword. v2 REQUIRES `deliver_to` (ISO 3166-1 alpha-2 country code, e.g. SG, US, MY) so results are ranked for the end user's market with per-row availability.",
+      "required_params": ["query", "deliver_to"]
+    },
+    {
+      "name": "get_product_v2",
+      "description": "Retrieve full details for a specific BuyWhere product by ID. v2 mirrors v1 plus per-row availability for the scoped market.",
+      "required_params": ["product_id"]
+    },
+    {
+      "name": "compare_products_v2",
+      "description": "Compare 2–10 products side-by-side across merchants. v2 lets callers scope the comparison to a market via `deliver_to`.",
+      "required_params": ["ids"]
+    },
+    {
+      "name": "get_deals_v2",
+      "description": "Find products with significant price drops, deliverability-filtered. v2 REQUIRES `deliver_to`.",
+      "required_params": ["deliver_to"]
+    },
+    {
+      "name": "find_best_price_v2",
+      "description": "Find the cheapest deliverable listing for a product across covered merchants. v2 REQUIRES `deliver_to`.",
+      "required_params": ["product_name", "deliver_to"]
+    }
+  ],
+  "tooling": {
+    "version": "1.1.0",
+    "contract": "v2 (deliver_to required on search/price/deals)",
+    "live_surface_until_v2_ships": "v1 (search_products, get_product, compare_products, find_best_price, get_deals, list_categories)",
+    "v2_status": "announced",
+    "v1_deprecates_on": "2026-10-01T00:00:00Z",
+    "v1_retires_on":   "2026-12-31T00:00:00Z",
+    "migration_guide": "https://api.buywhere.ai/docs/agent-dx#migration-guide-v1-v2",
+    "free_tier": {
+      "calls_per_month": 1000,
+      "sign_up_url": "https://buywhere.ai/api-keys"
+    }
+  }
 }
