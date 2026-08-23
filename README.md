@@ -92,6 +92,10 @@ curl -X POST https://api.buywhere.ai/v1/auth/register \
 # 2. Use the key
 export BUYWHERE_API_KEY=bw_...
 npx -y @buywhere/mcp-server
+
+# 3. Call v2 tools — always pass deliver_to
+search_products_v2({ query: "robot vacuum", deliver_to: "SG" })
+find_best_price_v2({ query: "iphone 16", deliver_to: "US" })
 ```
 
 Legacy email signup (60s, manual approval) → [buywhere.ai/api-keys](https://buywhere.ai/api-keys)
@@ -123,6 +127,31 @@ Also follow the **[BuyWhere Hashnode blog mirror](https://buywhere.hashnode.dev/
 | `get_price` | Current prices across all merchants for one product |
 | `get_affiliate_link` | Click-tracked affiliate URL for a product |
 | `get_catalog` | Available product category taxonomy |
+
+
+### v2 — `deliver_to` Required
+
+The v2 tool surface requires an end-user country code (`deliver_to`) on every search,
+price, and deals call so results are ranked for shippable products in that market.
+Calls without `deliver_to` return error `-32602 INVALID_PARAMETER`.
+
+| Tool | Required Params | Description |
+|------|----------------|-------------|
+| `search_products_v2` | `query`, `deliver_to` | Search catalog filtered to end-user's market (SG, US, MY, etc.) |
+| `get_product_v2` | `product_id` | Full product details with per-row availability for the scoped market |
+| `compare_products_v2` | `ids[]` | Compare 2–10 products, scoped to a market via `deliver_to` |
+| `find_best_price_v2` | `query`, `deliver_to` | Return the single cheapest shippable listing |
+| `get_deals_v2` | `deliver_to` | All products with ≥20% price drops, filtered to shippable in market |
+
+```python
+# v2 call — always include deliver_to (ISO 3166-1 alpha-2)
+search_products_v2({ query: "robot vacuum", deliver_to: "SG" })
+find_best_price_v2({ query: "iphone 16", deliver_to: "US" })
+get_deals_v2({ deliver_to: "MY" })
+
+# v1 is still available (legacy)
+search_products({ query: "robot vacuum" })
+```
 
 ## MCP Client Configuration
 
@@ -333,6 +362,11 @@ result = crew.kickoff()
 
 ## Install
 
+> **v2 tools require `deliver_to`** — on the v2 surface (search, find_best_price,
+> get_deals), every call must include the end-user's ISO 3166-1 alpha-2 country
+> code so results are ranked for shippable products. Omitting it returns error
+> `-32602 INVALID_PARAMETER`.
+
 ```bash
 # Run directly (no install)
 npx -y @buywhere/mcp-server
@@ -356,14 +390,16 @@ buywhere-mcp
 ```
 Developer's AI Agent (Claude, Cursor, etc.)
   │
-  ├── MCP Protocol (stdio)
+  ├── MCP Protocol (stdio or streamable-http)
   │
   ├── @buywhere/mcp-server
-  │     ├── search_products(q, category, min_price, max_price, country_code)
-  │     ├── get_product(product_id)
+  │     ├── search_products_v2(q, deliver_to)   # v2: requires deliver_to
+  │     ├── get_product_v2(product_id)
+  │     ├── compare_products_v2(ids[], deliver_to)
+  │     ├── find_best_price_v2(q, deliver_to)   # v2: requires deliver_to
+  │     ├── get_deals_v2(deliver_to)             # v2: requires deliver_to
+  │     ├── get_product(product_id)             # v1: still available
   │     ├── compare_prices(product_ids[])
-  │     ├── get_price(product_id)
-  │     ├── get_affiliate_link(product_id, platform)
   │     └── get_catalog()
   │
   └── BuyWhere API (api.buywhere.ai)
@@ -403,7 +439,7 @@ These complementary MCP packages extend BuyWhere into powerful multi-tool workfl
 
 | Protocol | Support |
 |----------|---------|
-| **MCP** (Model Context Protocol) | Full support — 6 tools, stdio transport |
+| **MCP** (Model Context Protocol) | Full support — 11 tools (6 v1 + 5 v2), stdio + streamable-http transports |
 | **A2A** (Agent-to-Agent) | Multi-agent task delegation — [Agent Card](https://buywhere.ai/.well-known/agent.json) |
 
 ## Contributing
@@ -433,3 +469,4 @@ If you find this project useful:
 ## License
 
 MIT
+
