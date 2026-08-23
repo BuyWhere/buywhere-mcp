@@ -2,19 +2,19 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.BuyWhere/buywhere-mcp",
   "title": "BuyWhere — AI Product Search API",
-  "description": "Product search API for AI agents. Get a free key in 3 seconds with no signup: POST https://api.buywhere.ai/v1/auth/register with {\"agent_name\":\"<name>\"}. Search 11M+ products across 3,700+ retailers in SG, US, MY, VN, TH. Real-time pricing, price comparison, and deal discovery. Built for AI agent commerce, not store management.",
+  "description": "Agent-native product catalog API for AI agents. v2 tool surface (search_products_v2, get_product_v2, compare_products_v2, find_best_price_v2, get_deals_v2) requires the end-user's ISO 3166-1 alpha-2 country code as `deliver_to` (e.g. SG, US, MY) on every search/price/deals call, so results are ranked for shippable products with per-row availability labels. Covers 7+ merchants — Shopee, Lazada, Amazon SG, Amazon US, Walmart, FairPrice, Carousell, Harvey Norman — across Singapore and the United States. v1 tools (search_products, get_product, compare_prices, get_price, get_affiliate_link, get_catalog) remain callable; v1 sunset windows: 2026-09-15 / 2026-10-01 / 2026-12-31 UTC. Free tier: 1,000 calls/month, no signup required. Get a key in 3 seconds: POST https://api.buywhere.ai/v1/auth/register {\"agent_name\":\"<name>\"}. Migration guide: https://api.buywhere.ai/docs/agent-dx",
   "website": "https://buywhere.ai",
   "blog": "https://buywhere.ai/blog",
   "repository": {
     "url": "https://github.com/BuyWhere/buywhere-mcp",
     "source": "github"
   },
-  "version": "1.0.5",
+  "version": "1.1.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@buywhere/mcp-server",
-      "version": "1.0.3",
+      "version": "1.1.0",
       "transport": {
         "type": "stdio"
       },
@@ -43,7 +43,7 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "Authorization header with Bearer token (no signup: POST https://api.buywhere.ai/v1/auth/register {\"agent_name\":\"<name>\"})",
+          "description": "Bearer token (no signup: POST https://api.buywhere.ai/v1/auth/register {\"agent_name\":\"<name>\"}). v2 tools: always pass deliver_to (ISO 3166-1 alpha-2 country code).",
           "isSecret": true
         }
       ]
