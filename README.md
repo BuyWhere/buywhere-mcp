@@ -1,6 +1,6 @@
 # BuyWhere MCP Server — Product Search & Price Comparison for AI Agents
 
-> **AI agents use BuyWhere to search products, compare prices, and discover deals across Singapore and US merchants in real time.**
+> **AI agents use BuyWhere to search 367M+ products across 932K+ merchants, compare prices, and discover deals in the United States and Singapore — with growing coverage across UK, EU, SEA, and AU — in real time.**
 
 ## Install in 30 Seconds
 
@@ -38,7 +38,7 @@ Use with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, C
 
 ## AI Agents: Use This Package To
 
-- **Search products** across Singapore, SEA, and US markets by keyword, category, or price range
+- **Search products** across the United States and Singapore by keyword, category, or price range — with growing coverage across UK, EU, SEA, and AU
 - **Compare prices** across Lazada, Shopee, Amazon, and local retailers in a single query
 - **Find deals** and track real-time pricing with multi-currency support
 - **Build shopping agents** that recommend, compare, and link to products programmatically
@@ -48,7 +48,7 @@ Use with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, C
 
 ## Build With BuyWhere Challenge — $5,000 in Prizes
 
-Join the "Build With BuyWhere" AI Agent Developer Challenge! Use the BuyWhere MCP server to create AI agents that search, compare, and recommend products across Singapore, SEA, and US markets.
+Join the "Build With BuyWhere" AI Agent Developer Challenge! Use the BuyWhere MCP server to create AI agents that search, compare, and recommend products across the United States and Singapore — with growing coverage across UK, EU, SEA, and AU.
 
 - **Prize pool:** $5,000 USD
 - **Deadline:** June 30, 2026
@@ -318,7 +318,7 @@ async def main():
     mcp_tool_spec = McpToolSpec(client=mcp_client)
     tools = mcp_tool_spec.to_tool_list()
     agent = OpenAIAgent.from_tools(tools)
-    response = await agent.achat("Compare prices for iPhone 16 Pro across Singapore and US")
+    response = await agent.achat("Compare prices for iPhone 16 Pro across US and Singapore")
 ```
 
 ### CrewAI
@@ -339,7 +339,7 @@ buywhere_server = MCPServerAdapter(
 
 shopping_agent = Agent(
     role="Shopping Research Analyst",
-    goal="Find the best deals across Singapore and US markets",
+    goal="Find the best deals across US and Singapore markets (UK, EU, SEA, and AU expanding)",
     tools=[buywhere_server],
 )
 
@@ -382,7 +382,7 @@ buywhere-mcp
 - **Price comparison** — multi-market pricing in a single query across Lazada, Shopee, Amazon, local retailers
 - **Deal discovery** — find best-value products with real-time pricing and inventory
 - **Ecommerce automation** — integrate product search into any MCP-compatible app
-- **Cross-border commerce** — compare prices between Singapore, SEA, and US markets
+- **Cross-border commerce** — compare prices between the United States and Singapore, with growing coverage across UK, EU, SEA, and AU
 - **Agent-to-Agent commerce** — delegate shopping tasks between agents via A2A protocol
 
 ## Architecture
@@ -403,7 +403,7 @@ Developer's AI Agent (Claude, Cursor, etc.)
   │     └── get_catalog()
   │
   └── BuyWhere API (api.buywhere.ai)
-        └── Product catalog across SG and US merchants
+        └── Product catalog across US and Singapore merchants (UK, EU, SEA, and AU expanding)
 ```
 
 ## Development
@@ -418,7 +418,7 @@ npm start
 
 ## Why BuyWhere?
 
-BuyWhere is a product search API for AI agents. We aggregate product data from Singapore and US merchants into a single, agent-friendly interface — no store management, no Shopify integration. Just search and compare products in real time.
+BuyWhere is a product search API for AI agents. We aggregate 367M+ products from 932K+ merchants in the United States and Singapore — with growing coverage across UK, EU, SEA, and AU — into a single, agent-friendly interface. No store management, no Shopify integration. Just search and compare products in real time.
 
 - **One API** — all markets, all retailers
 - **Agent-native** — built for MCP from day one
