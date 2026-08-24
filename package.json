@@ -79,7 +79,9 @@
     "verify:registries": "node scripts/verify-mcp-registry-listings.mjs",
     "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "smoke": "node scripts/smoke-tools.mjs",
+    "test": "node scripts/smoke-tools.mjs"
   },
   "publishConfig": {
     "access": "public",

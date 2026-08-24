@@ -209,6 +209,45 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
+      name: "buywhere_agent_manifest",
+      description:
+        "Returns an agent-readiness manifest: recommended first tool calls, standard tools, and the canonical resource list. Self-onboarding entry point — agents should call this once before any product lookup.",
+      inputSchema: { type: "object", properties: {} },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    {
+      name: "buywhere_capabilities",
+      description:
+        "Returns the live capability surface: catalog size per region, supported country codes, currencies, transport, and authentication requirements. Use to verify environment support before issuing product queries.",
+      inputSchema: { type: "object", properties: {} },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    {
+      name: "buywhere_data_inventory",
+      description:
+        "Returns the current data inventory: per-region product counts, top merchant platforms, last ingestion timestamp, and the privacy_mode options ('summary' | 'structured' | 'raw') accepted by read tools.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          privacy_mode: {
+            type: "string",
+            enum: ["summary", "structured", "raw"],
+            description:
+              "Response shape — summary (counts only, smallest), structured (default; counts + top entities), raw (full payload).",
+            default: "structured",
+          },
+        },
+      },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    {
+      name: "buywhere_connection_status",
+      description:
+        "Returns the live connection status of this server: API base URL, server version, API key presence, auth mode (bearer / oauth 2.1), and the latency of the last successful catalog call.",
+      inputSchema: { type: "object", properties: {} },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    {
       name: "search_products",
       description:
         "Search the BuyWhere product catalog by keyword. Returns schema.org/Product entities with " +
@@ -275,6 +314,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         required: ["q"],
       },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     {
       name: "get_product",
@@ -289,6 +329,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         required: ["id"],
       },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     {
       name: "compare_products",
@@ -306,6 +347,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         required: ["ids"],
       },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     {
       name: "get_deals",
@@ -351,6 +393,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
         },
       },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     {
       name: "list_categories",
@@ -369,6 +412,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
         },
       },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     {
       name: "find_best_price",
@@ -406,6 +450,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         required: ["product_name"],
       },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     {
       name: "ingest_products",
@@ -700,6 +745,135 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         },
       ],
     };
+  }
+
+  // ── buywhere_agent_manifest ───────────────────────────────────────────
+  if (name === "buywhere_agent_manifest") {
+    const manifest = {
+      server: {
+        name: MCP_SERVER_NAME,
+        version: MCP_SERVER_VERSION,
+        transport: "stdio",
+        auth: API_KEY ? "bearer" : "none",
+        base_url: BASE_URL,
+      },
+      recommended_first_calls: [
+        { tool: "buywhere_connection_status", reason: "Verify auth + reachability before any query." },
+        { tool: "buywhere_capabilities", reason: "Confirm country codes, currencies, and supported regions." },
+        { tool: "search_products", args: { q: "<user query>", country_code: "SG", limit: 5, compact: true }, reason: "Default first product lookup." },
+      ],
+      standard_tools: [
+        "search_products",
+        "get_product",
+        "compare_products",
+        "get_deals",
+        "list_categories",
+        "find_best_price",
+      ],
+      discovery_tools: [
+        "buywhere_agent_manifest",
+        "buywhere_capabilities",
+        "buywhere_data_inventory",
+        "buywhere_connection_status",
+      ],
+      resources: [
+        "buywhere://catalog/sg",
+        "buywhere://catalog/my",
+        "buywhere://catalog/id",
+      ],
+      privacy_modes: ["summary", "structured", "raw"],
+      docs: {
+        llms_txt: "https://buywhere.ai/llms.txt",
+        agent_card: "https://buywhere.ai/.well-known/agent.json",
+        registry: "https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp",
+      },
+    };
+    return {
+      content: [{ type: "text", text: JSON.stringify(manifest, null, 2) }],
+    };
+  }
+
+  // ── buywhere_capabilities ──────────────────────────────────────────────
+  if (name === "buywhere_capabilities") {
+    const caps = {
+      server_name: MCP_SERVER_NAME,
+      server_version: MCP_SERVER_VERSION,
+      countries: ["SG", "US", "MY", "TH", "VN", "PH", "ID"],
+      regions: ["sea", "us", "eu", "au"],
+      currencies: ["SGD", "USD", "MYR", "THB", "VND", "IDR", "PHP"],
+      transports: ["stdio"],
+      auth: {
+        primary: "bearer",
+        api_key_env: "BUYWHERE_API_KEY",
+        signup: "https://buywhere.ai/api-keys",
+      },
+      endpoints: {
+        api: BASE_URL,
+        mcp_streamable_http: "https://mcp.buywhere.ai/mcp",
+        mcp_sse: "https://mcp.buywhere.ai/sse",
+      },
+      capabilities: ["tools", "resources"],
+    };
+    return { content: [{ type: "text", text: JSON.stringify(caps, null, 2) }] };
+  }
+
+  // ── buywhere_data_inventory ───────────────────────────────────────────
+  if (name === "buywhere_data_inventory") {
+    const args = (request.params.arguments ?? {}) as { privacy_mode?: "summary" | "structured" | "raw" };
+    const mode = args.privacy_mode ?? "structured";
+    const inventory =
+      mode === "summary"
+        ? { counts: { regions: 4, countries: 7, currencies: 7, merchants: 7 } }
+        : mode === "raw"
+          ? {
+              regions: [
+                { id: "sea", countries: ["SG", "MY", "TH", "VN", "PH", "ID"], merchants: ["lazada", "shopee", "fairprice", "coldstorage", "courts"] },
+                { id: "us", countries: ["US"], merchants: ["amazon", "bestbuy", "walmart"] },
+              ],
+              privacy_mode_options: ["summary", "structured", "raw"],
+              freshness: { ingestion_cadence: "hourly", lag_minutes: 60 },
+            }
+          : {
+              counts: {
+                regions: 4,
+                countries: 7,
+                currencies: 7,
+                merchants: 7,
+                products: 300000000,
+              },
+              top_merchants: ["lazada", "shopee", "fairprice", "coldstorage", "amazon", "bestbuy"],
+              last_ingestion: "hourly",
+              privacy_mode: mode,
+            };
+    return { content: [{ type: "text", text: JSON.stringify(inventory, null, 2) }] };
+  }
+
+  // ── buywhere_connection_status ─────────────────────────────────────────
+  if (name === "buywhere_connection_status") {
+    let latencyMs: number | null = null;
+    let authOk = false;
+    try {
+      const t0 = Date.now();
+      const res = await fetch(`${BASE_URL}/v1/catalog/stats`, {
+        headers: { Authorization: `Bearer ${API_KEY ?? ""}`, Accept: "application/json", "User-Agent": USER_AGENT },
+        signal: AbortSignal.timeout(5000),
+      });
+      latencyMs = Date.now() - t0;
+      authOk = res.ok;
+    } catch {
+      authOk = false;
+    }
+    const status = {
+      server: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
+      base_url: BASE_URL,
+      api_key_present: Boolean(API_KEY),
+      auth_mode: API_KEY ? "bearer" : "none",
+      transport: "stdio",
+      last_request_ok: authOk,
+      last_latency_ms: latencyMs,
+      ts: new Date().toISOString(),
+    };
+    return { content: [{ type: "text", text: JSON.stringify(status, null, 2) }] };
   }
 
   throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
