@@ -5,6 +5,9 @@
 ## Install in 30 Seconds
 
 ```bash
+# Agents: get a key with zero human steps (no email):
+# curl -X POST "https://api.buywhere.ai/v1/auth/register?verify=false" \
+#   -H "Content-Type: application/json" -d '{"agent_name": "my-agent"}'
 export BUYWHERE_API_KEY=bw_live_xxxx
 npx -y @buywhere/mcp-server
 ```
