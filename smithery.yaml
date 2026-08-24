@@ -1,14 +1,23 @@
 # Smithery MCP server manifest — https://smithery.ai
-# BuyWhere: Agent-native product catalog API for Southeast Asia commerce
-# v1.1.0 — P2.7 surface refresh. Lead with deliver_to REQUIRED contract for v2.
+# BuyWhere: Agent-native product catalog API for AI agents
+# v1.1.0 — P2.7 surface refresh (BUY-73963, 2026-08-24).
+# Lead with deliver_to REQUIRED contract for v2, flag 370M catalog,
+# OAuth 2.1, and no-email bearer key path.
 
 name: buywhere
 displayName: BuyWhere MCP Server
 description: >
-  Agent-native product catalog API for AI agents. Every search/best-price/deals
-  call requires the end-user's ISO 3166-1 alpha-2 country code as `deliver_to`
-  (e.g. SG, US, MY, TH, ID, VN, PH, GB, AU, IN), so results are ranked for
-  products your user can actually receive, with per-row availability labels.
+  Agent-native product catalog API for AI agents, ~370M deduplicated products
+  across 28 countries. Every v2 search/best-price/deals call REQUIRES the
+  end-user's ISO 3166-1 alpha-2 country code as `deliver_to` (e.g. SG, US, MY,
+  TH, ID, VN, PH, GB, AU, IN), so results are ranked for products your user can
+  actually receive, with per-row availability labels (in_stock / out_of_stock /
+  preorder / discontinued / unshippable).
+
+  Authentication: OAuth 2.1 (client_credentials) at
+  https://api.buywhere.ai/v1/oauth/token, OR a no-email bearer key obtained in
+  3 seconds via POST https://api.buywhere.ai/v1/auth/register with
+  {"agent_name":"<your-agent>"}. No credit card, no signup form.
 
   Cover 7+ merchants — Shopee, Lazada, Amazon SG, Amazon US, Walmart, FairPrice,
   Carousell, Harvey Norman — across Singapore and the United States. Search
@@ -17,7 +26,7 @@ description: >
   deliverable listing (find_best_price_v2), and surface discounted stock
   (get_deals_v2).
 
-  Free tier: 1,000 calls/month. API key at https://buywhere.ai/api-keys.
+  Free tier: 1,000 calls/month. v1 deprecates 2026-10-01Z, retires 2026-12-31Z.
 
   📚 Agent-developer guide: https://api.buywhere.ai/docs/agent-dx
   📚 Engineering blog: https://buywhere.ai/blog
