@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.BuyWhere/buywhere-mcp",
   "title": "BuyWhere \u2014 AI Product Search API",
-  "description": "Cross-border product catalog for AI agents. Search 400M+ products across US, SG, MY with real-time prices from 7+ merchants.",
+  "description": "Product catalog for AI agents \u2014 real-time prices across US, SG, MY merchants",
   "website": "https://buywhere.ai",
   "blog": "https://buywhere.ai/blog",
   "repository": {
