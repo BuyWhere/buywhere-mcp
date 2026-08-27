@@ -1,0 +1,52 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.BuyWhere/buywhere-mcp",
+  "title": "BuyWhere \u2014 AI Product Search API",
+  "description": "Cross-border product catalog for AI agents. Search 400M+ products across US, SG, MY with real-time prices from 7+ merchants.",
+  "website": "https://buywhere.ai",
+  "blog": "https://buywhere.ai/blog",
+  "repository": {
+    "url": "https://github.com/BuyWhere/buywhere-mcp",
+    "source": "github"
+  },
+  "version": "1.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@buywhere/mcp-server",
+      "version": "1.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BUYWHERE_API_KEY",
+          "description": "BuyWhere API key. Get one in 3 seconds with no signup: POST https://api.buywhere.ai/v1/auth/register with {\"agent_name\":\"<name>\"} (no email). Legacy email signup: https://buywhere.ai/api-keys",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "BUYWHERE_API_URL",
+          "description": "Optional override for the BuyWhere API base URL.",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.buywhere.ai/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token (no signup: POST https://api.buywhere.ai/v1/auth/register {\"agent_name\":\"<name>\"}). v2 tools: always pass deliver_to (ISO 3166-1 alpha-2 country code).",
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
