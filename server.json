@@ -9,12 +9,12 @@
     "url": "https://github.com/BuyWhere/buywhere-mcp",
     "source": "github"
   },
-  "version": "0.3.14",
+  "version": "0.3.11",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@buywhere/mcp-server",
-      "version": "0.3.14",
+      "version": "0.3.11",
       "transport": {
         "type": "stdio"
       },
