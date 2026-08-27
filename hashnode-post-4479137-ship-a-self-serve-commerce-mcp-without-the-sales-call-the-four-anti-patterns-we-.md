@@ -49,4 +49,8 @@ https://buywhere.ai/blog/true-zero-human-self-serve-mcp-2026?utm_source=devto&ut
 
 If you wire it and hit a real bug, I'd genuinely like to hear about it in the comments. Honest trade-offs are also on the post: 1,000/day is generous but not infinite, and enterprise scale (millions of calls/day, custom catalogs, contract-grade SLAs) still requires talking to us.
 
+---
+
+**Update (Aug 2026):** BuyWhere MCP is now live at [api.buywhere.ai/mcp](https://api.buywhere.ai/mcp) — self-serve, no sales call required. See the [full launch post](https://dev.to/buywhere/mcp-catalog-post) for details.
+
 #mcp #ai #opensource #webdev
