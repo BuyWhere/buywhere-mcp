@@ -1,8 +1,8 @@
 {
   "name": "@buywhere/mcp-server",
-  "version": "0.3.17",
+  "version": "0.4.0",
   "mcpName": "io.github.BuyWhere/buywhere-mcp",
-  "description": "Agent-native product catalog MCP server. Search & compare 367M+ products across 932K+ merchants in the United States and Singapore (growing coverage across UK, EU, SEA, and AU). Location-aware search with `deliver_to` and `availability` labels (local | ships_to_you | unavailable | unknown); agent-optimized responses via `compact=true`. Built for AI agent commerce, not store management. Canonical stats: GET /v1/catalog/stats.",
+  "description": "Stdio bridge to the hosted BuyWhere MCP server \u2014 300M+ products, 150,000+ stores, deliver_to ranking.",
   "keywords": [
     "buywhere",
     "mcp",
