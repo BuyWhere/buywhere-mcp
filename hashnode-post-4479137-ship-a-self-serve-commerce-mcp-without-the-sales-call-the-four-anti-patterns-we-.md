@@ -1,7 +1,7 @@
 ---
 title: "Ship a self-serve commerce MCP without the sales call: the four anti-patterns we removed"
 slug: "ship-a-self-serve-commerce-mcp-without-the-sales-call-the-four-anti-patterns-we-removed-3ejp"
-tags: "mcp, ai, opensource, claude"
+tags: "mcp, llms, ecommerce, claude"
 domain: "buywhere.hashnode.dev"
 canonical: "https://dev.to/buywhere/ship-a-self-serve-commerce-mcp-without-the-sales-call-the-four-anti-patterns-we-removed-3ejp"
 enableToc: true
