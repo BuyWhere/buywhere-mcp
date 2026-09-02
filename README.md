@@ -115,6 +115,13 @@ Also follow the **[BuyWhere Hashnode blog mirror](https://buywhere.hashnode.dev/
 | `list_categories` | Available product category taxonomy |
 | `find_similar` | Similar products by vector similarity |
 | `ingest_products` | Submit product URLs for catalog ingestion (agents/merchants) |
+| `search_products_v2` | v2 search; requires `deliver_to` (ISO country) |
+| `get_product_v2` | v2 product details by ID |
+| `compare_products_v2` | v2 comparison; optional `deliver_to` |
+| `get_deals_v2` | v2 deals; requires `deliver_to` |
+| `find_best_price_v2` | v2 best price; requires `deliver_to` |
+
+Remote MCP: `POST https://api.buywhere.ai/mcp` (JSON-RPC 2.0, protocolVersion 2024-11-05, 13 tools). Glama listing: https://glama.ai/mcp/servers/BuyWhere/buywhere-mcp
 
 ## MCP Client Configuration
 
