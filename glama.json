@@ -6,16 +6,59 @@
   "categories": [
     "AI & Machine Learning",
     "Developer Tools",
+    "E-commerce",
+    "Shopping",
     "Product Search",
     "Price Comparison"
   ],
   "website": "https://buywhere.ai",
   "blog": "https://buywhere.ai/blog",
-  "description": "Agent-native product catalog API for AI agents, ~370M deduplicated products across 28 countries. v2 tool surface (search_products_v2, get_product_v2, compare_products_v2, find_best_price_v2, get_deals_v2) requires the end-user's ISO 3166-1 alpha-2 country code as `deliver_to` on every search/price/deals call, so results are ranked for products your user can actually receive with per-row availability. Merchants include Shopee, Lazada, Amazon SG, Amazon US, Walmart, FairPrice, Carousell, Harvey Norman. Authentication: OAuth 2.1 client_credentials at https://api.buywhere.ai/v1/oauth/token, OR a no-email bearer key obtained in 3 seconds via POST https://api.buywhere.ai/v1/auth/register with {\"agent_name\":\"<your-agent>\"}. Free tier: 1,000 calls/month. Live catalog stats: GET https://api.buywhere.ai/v1/catalog/stats. v1 deprecates 2026-10-01Z, retires 2026-12-31Z. Migration guide: https://api.buywhere.ai/docs/agent-dx",
+  "description": "AI shopping MCP for live product search and price comparison across SEA and US merchants (Shopee, Lazada, Amazon SG/US, FairPrice, Carousell, and more). Remote endpoint: POST https://api.buywhere.ai/mcp (JSON-RPC 2.0, protocolVersion 2024-11-05). Auth: Bearer via POST https://api.buywhere.ai/v1/auth/register. Live tools (13): search_products, get_product, compare_products, get_deals, list_categories, find_best_price, find_similar, ingest_products, search_products_v2, get_product_v2, compare_products_v2, get_deals_v2, find_best_price_v2. v2 calls require deliver_to (ISO 3166-1 alpha-2). Do not use the legacy Glama twin BuyWhere/buywhere.",
   "tools": [
     {
+      "name": "search_products",
+      "description": "Search catalog by keyword, category, price, country.",
+      "required_params": [
+        "query"
+      ]
+    },
+    {
+      "name": "get_product",
+      "description": "Full product details by ID.",
+      "required_params": [
+        "product_id"
+      ]
+    },
+    {
+      "name": "compare_products",
+      "description": "Side-by-side comparison of products.",
+      "required_params": [
+        "ids"
+      ]
+    },
+    {
+      "name": "get_deals",
+      "description": "Products with significant price drops."
+    },
+    {
+      "name": "list_categories",
+      "description": "Product category taxonomy."
+    },
+    {
+      "name": "find_best_price",
+      "description": "Cheapest listing for a product across merchants."
+    },
+    {
+      "name": "find_similar",
+      "description": "Similar products by vector similarity."
+    },
+    {
+      "name": "ingest_products",
+      "description": "Submit product URLs for catalog ingestion."
+    },
+    {
       "name": "search_products_v2",
-      "description": "Search the BuyWhere product catalog by keyword. v2 REQUIRES `deliver_to` (ISO 3166-1 alpha-2 country code, e.g. SG, US, MY) so results are ranked for the end user's market with per-row availability.",
+      "description": "v2 search; REQUIRES deliver_to.",
       "required_params": [
         "query",
         "deliver_to"
@@ -23,28 +66,28 @@
     },
     {
       "name": "get_product_v2",
-      "description": "Retrieve full details for a specific BuyWhere product by ID. v2 mirrors v1 plus per-row availability for the scoped market.",
+      "description": "v2 product details.",
       "required_params": [
         "product_id"
       ]
     },
     {
       "name": "compare_products_v2",
-      "description": "Compare 2\u201310 products side-by-side across merchants. v2 lets callers scope the comparison to a market via `deliver_to`.",
+      "description": "v2 comparison; optional deliver_to.",
       "required_params": [
         "ids"
       ]
     },
     {
       "name": "get_deals_v2",
-      "description": "Find products with significant price drops, deliverability-filtered. v2 REQUIRES `deliver_to`.",
+      "description": "v2 deals; REQUIRES deliver_to.",
       "required_params": [
         "deliver_to"
       ]
     },
     {
       "name": "find_best_price_v2",
-      "description": "Find the cheapest deliverable listing for a product across covered merchants. v2 REQUIRES `deliver_to`.",
+      "description": "v2 best price; REQUIRES deliver_to.",
       "required_params": [
         "product_name",
         "deliver_to"
@@ -52,10 +95,11 @@
     }
   ],
   "tooling": {
-    "version": "1.1.0",
-    "contract": "v2 (deliver_to required on search/price/deals)",
-    "live_surface_until_v2_ships": "v1 (search_products, get_product, compare_products, find_best_price, get_deals, list_categories)",
-    "v2_status": "announced",
+    "version": "live-2026-09-02",
+    "contract": "v1 + v2 (13 tools advertised at https://api.buywhere.ai/mcp)",
+    "live_surface": "13 tools matching GET https://api.buywhere.ai/mcp",
+    "remote": "https://api.buywhere.ai/mcp",
+    "protocolVersion": "2024-11-05",
     "v1_deprecates_on": "2026-10-01T00:00:00Z",
     "v1_retires_on": "2026-12-31T00:00:00Z",
     "migration_guide": "https://api.buywhere.ai/docs/agent-dx#migration-guide-v1-v2",
