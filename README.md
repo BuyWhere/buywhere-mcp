@@ -30,7 +30,7 @@ Use with **Claude Desktop, Cursor, VS Code Copilot, Cline, Windsurf, OpenCode, C
 [![Node version](https://img.shields.io/badge/node-%3E%3D18-green)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
 [![GitHub stars](https://img.shields.io/github/stars/BuyWhere/buywhere-mcp?style=social)](https://github.com/BuyWhere/buywhere-mcp)
-[![Smithery](https://smithery.ai/badge/@BuyWhere/buywhere-mcp)](https://smithery.ai/servers/@buywhere/mcp-server)
+[![LightNow capabilities](https://lightnow.ai/badge/io.github.BuyWhere/buywhere-mcp)](https://lightnow.ai/servers/io.github.BuyWhere/buywhere-mcp)
 [![MCP Registry](https://img.shields.io/badge/MCP%20Registry-published-blue)](https://registry.modelcontextprotocol.io/?q=io.github.BuyWhere%2Fbuywhere-mcp)
 [![Hashnode Blog](https://img.shields.io/badge/Hashnode-Blog-2962FF?logo=hashnode&logoColor=white)](https://buywhere.hashnode.dev/)
 
