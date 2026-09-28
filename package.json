@@ -101,7 +101,7 @@
   "devDependencies": {
     "@types/node": "^20.19.43",
     "typescript": "^5.9.3",
-    "undici-types": "^6.21.0"
+    "undici-types": "^8.11.2"
   },
   "engines": {
     "node": ">=18"
