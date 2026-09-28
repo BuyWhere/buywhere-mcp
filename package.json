@@ -99,7 +99,7 @@
     "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.19.43",
+    "@types/node": "^26.6.3",
     "typescript": "^5.9.3",
     "undici-types": "^6.21.0"
   },
