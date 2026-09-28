@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "buywhere": {
+      "command": "npx",
+      "args": ["-y", "@buywhere/mcp-server"],
+      "env": {
+        "BUYWHERE_API_KEY": "${BUYWHERE_API_KEY}"
+      }
+    }
+  }
+}
